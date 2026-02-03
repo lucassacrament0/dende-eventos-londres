@@ -1,12 +1,16 @@
 enum class Sexo { MASCULINO, FEMININO, NAO_INFORMADO }
+enum class Tipo { COMUM, ORGANIZADOR }
 
 data class Usuario(
-    val nome: String,
-    val dataNascimento: String,
-    val sexo: Sexo,
+    var nome: String,
+    var dataNascimento: String,
+    var sexo: Sexo,
     val email: String,
-    val senha: String,
-    val organizador: Boolean
+    var senha: String,
+    val organizador: Tipo,
+    var cnpj: String? = null,
+    var razaoSocial: String? = null,
+    var nomeFantasia: String? = null
 )
 
 fun main() {
@@ -19,7 +23,7 @@ fun main() {
     // Loop do menu principal
     while (continuar) {
         println("MENU PRINCIPAL")
-        println("1. Cadastrar Usuário Comum")
+        println("1. Cadastrar Usuário")
         println("0. Sair")
 
         print("Digite sua opção: ")
@@ -27,7 +31,7 @@ fun main() {
 
         when (opcao) {
             "1" -> {
-                println("\nNOVO USUÁRIO COMUM")
+                println("\nNOVO USUÁRIO")
 
                 print("E-mail: ")
                 val email = readln()
@@ -43,7 +47,7 @@ fun main() {
                 if (emailRepetido) {
                     println("ERRO: Este e-mail já está cadastrado!\n")
                 } else {
-                    // O e-mail é único, segue
+                    // O e-mail é único, recebe as informações de cadastro
                     print("Nome completo: ")
                     var nome = readln()
 
@@ -53,7 +57,7 @@ fun main() {
                     print("Senha: ")
                     var senha = readln()
 
-                    // Enum para garantir que funcione
+                    // Utiliza o enum para limitar as opções
                     println("Sexo: [1] MASCULINO, [2] FEMININO, [QUALQUER TECLA] PULAR")
                     print("Escolha: ")
                     val opcaoSexo = readln()
@@ -63,7 +67,41 @@ fun main() {
                         "2" -> Sexo.FEMININO
                         else -> Sexo.NAO_INFORMADO
                     }
+                    // Verifica se é usuário organizador
+                    println("Você é organizador de eventos?\nDigite: [1] SIM, [QUALQUER TECLA] NÃO")
+                    print("Digite: ")
+                    val tipoUsuario = readln()
 
+                    var organizador = when (tipoUsuario) {
+                        "1" -> Tipo.ORGANIZADOR
+                        else -> Tipo.COMUM
+                    }
+                    // Variaveis para empresas
+                    var empresa: String
+                    var cnpj: String? = null
+                    var razaoSocial: String? = null
+                    var nomeFantasia: String? = null
+
+                    // Para os organizadores...
+                    if (tipoUsuario == "1") {
+
+                        // Verifica se tem empresa
+                        println("Você possui uma empresa? [1] SIM [QUALQUER TECLA] NÃO")
+                        print("Digite: ")
+                        empresa = readln()
+
+                        if (empresa == "1") {
+
+                            print("CNPJ: ")
+                            cnpj = readln()
+
+                            print("Razão Social: ")
+                            razaoSocial = readln()
+
+                            print("Nome Fantasia: ")
+                            nomeFantasia = readln()
+                        }
+                    }
                     // Adicionando o usuario cadastrado
                     val novoUsuario = Usuario(
                         nome = nome,
@@ -71,7 +109,10 @@ fun main() {
                         sexo = sexoEscolhido,
                         email = email,
                         senha = senha,
-                        organizador = false // O usuario é comum por padrão
+                        organizador = organizador,
+                        cnpj = cnpj,
+                        razaoSocial = razaoSocial,
+                        nomeFantasia = nomeFantasia
                     )
 
                     listaUsuarios.add(novoUsuario)
@@ -84,7 +125,9 @@ fun main() {
                 continuar = false
             }
 
-            else -> println("Opção inválida! Tente novamente.\n")
+            else -> {
+                println("Opção inválida! Tente novamente.\n")
+            }
         }
     }
 }
