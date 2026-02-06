@@ -7,7 +7,7 @@ data class Usuario(
     var sexo: Sexo,
     val email: String,
     var senha: String,
-    val organizador: Tipo,
+    val tipoUsuario: Tipo,
     var cnpj: String? = null,
     var razaoSocial: String? = null,
     var nomeFantasia: String? = null
@@ -18,7 +18,7 @@ fun main() {
     val listaUsuarios = mutableListOf<Usuario>()
     var continuar = true
 
-    println("Bem-vindo ao Dendê Eventos\n")
+    println("BEM-VINDO AO DENDÊ EVENTOS\n")
 
     // Loop do menu principal
     while (continuar) {
@@ -26,7 +26,7 @@ fun main() {
         println("1. Cadastrar Usuário")
         println("0. Sair")
 
-        print("Digite sua opção: ")
+        print("Digite: ")
         val opcao = readln()
 
         when (opcao) {
@@ -34,99 +34,106 @@ fun main() {
                 println("\nNOVO USUÁRIO")
 
                 print("E-mail: ")
-                val email = readln()
+                val cadastroEmail = readln()
 
                 // Verifica se o e-mail já existe
                 var emailRepetido = false
                 for (usuario in listaUsuarios) {
-                    if (usuario.email == email) {
-                        emailRepetido = true
+                    when {
+                        usuario.email == cadastroEmail -> emailRepetido = true
                     }
                 }
+                when (emailRepetido) {
+                    true -> println("ERRO: Este e-mail já possui cadastro. Tente novamente.")
+                    false -> {
+                        // O e-mail é único, recebe as informações de cadastro
+                        print("Nome completo: ")
+                        val cadastroNome = readln()
 
-                if (emailRepetido) {
-                    println("ERRO: Este e-mail já está cadastrado!\n")
-                } else {
-                    // O e-mail é único, recebe as informações de cadastro
-                    print("Nome completo: ")
-                    var nome = readln()
+                        print("Data de Nascimento (DD/MM/AAAA): ")
+                        val cadastroNascimento = readln()
 
-                    print("Data de Nascimento (DD/MM/AAAA): ")
-                    var dataNascimento = readln()
+                        print("Senha: ")
+                        val cadastroSenha = readln()
 
-                    print("Senha: ")
-                    var senha = readln()
-
-                    // Utiliza o enum para limitar as opções
-                    println("Sexo: [1] MASCULINO, [2] FEMININO, [QUALQUER TECLA] PULAR")
-                    print("Escolha: ")
-                    val opcaoSexo = readln()
-
-                    var sexoEscolhido = when (opcaoSexo) {
-                        "1" -> Sexo.MASCULINO
-                        "2" -> Sexo.FEMININO
-                        else -> Sexo.NAO_INFORMADO
-                    }
-                    // Verifica se é usuário organizador
-                    println("Você é organizador de eventos?\nDigite: [1] SIM, [QUALQUER TECLA] NÃO")
-                    print("Digite: ")
-                    val tipoUsuario = readln()
-
-                    var organizador = when (tipoUsuario) {
-                        "1" -> Tipo.ORGANIZADOR
-                        else -> Tipo.COMUM
-                    }
-                    // Variaveis para empresas
-                    var empresa: String
-                    var cnpj: String? = null
-                    var razaoSocial: String? = null
-                    var nomeFantasia: String? = null
-
-                    // Para os organizadores...
-                    if (tipoUsuario == "1") {
-
-                        // Verifica se tem empresa
-                        println("Você possui uma empresa? [1] SIM [QUALQUER TECLA] NÃO")
+                        // Utiliza o enum para limitar as opções
+                        println("Sexo: [1] MASCULINO, [2] FEMININO, [3] PREFIRO NÃO INFORMAR")
                         print("Digite: ")
-                        empresa = readln()
+                        val opcaoSexo = readln()
 
-                        if (empresa == "1") {
+                        val cadastroSexo = when (opcaoSexo) {
+                            "1" -> Sexo.MASCULINO
+                            "2" -> Sexo.FEMININO
+                            else -> Sexo.NAO_INFORMADO
+                        }
+                        println("SEXO DEFINIDO $cadastroSexo.")
 
-                            print("CNPJ: ")
-                            cnpj = readln()
+                        // Verifica se é usuário organizador
+                        println("Você é organizador de eventos? [1] SIM, [2] NÃO")
+                        print("Digite: ")
+                        val tipoUsuario = readln()
 
-                            print("Razão Social: ")
-                            razaoSocial = readln()
+                        val cadastroOrganizador = when (tipoUsuario) {
+                            "1" -> Tipo.ORGANIZADOR
+                            else -> Tipo.COMUM
+                        }
+                        println("DEFINIDO USUÁRIO $cadastroOrganizador.")
 
-                            print("Nome Fantasia: ")
-                            nomeFantasia = readln()
+                        // Variaveis para cadastrar empresas
+                        val cadastroEmpresa: String
+                        var cadastroCNPJ: String? = null
+                        var cadastroRazao: String? = null
+                        var cadastroFantasia: String? = null
+
+                        // Para os organizadores...
+                        when (tipoUsuario) {
+                            "1" -> {
+                                // Verifica se tem empresa
+                                println("Você possui uma empresa? [1] SIM [2] NÃO")
+                                print("Digite: ")
+                                cadastroEmpresa = readln()
+
+                                when (cadastroEmpresa) {
+                                    "1" -> {
+                                        println("CADASTRO DE EMPRESA")
+                                        print("Digite CNPJ: ")
+                                        cadastroCNPJ = readln()
+
+                                        print("Digite Razão Social: ")
+                                        cadastroRazao = readln()
+
+                                        print("Digite Nome Fantasia: ")
+                                        cadastroFantasia = readln()
+                                    }
+                                    else -> println("DEFINIDO USUÁRIO SEM EMPRESA.")
+                                }
+                                // Adicionando o usuario cadastrado
+                                val cadastroUsuario = Usuario(
+                                    nome = cadastroNome,
+                                    dataNascimento = cadastroNascimento,
+                                    sexo = cadastroSexo,
+                                    email = cadastroEmail,
+                                    senha = cadastroSenha,
+                                    tipoUsuario = cadastroOrganizador,
+                                    cnpj = cadastroCNPJ,
+                                    razaoSocial = cadastroRazao,
+                                    nomeFantasia = cadastroFantasia
+                                )
+
+                                listaUsuarios.add(cadastroUsuario)
+                                println("USUÁRIO CADASTRADO COM SUCESSO.")
+                            }
                         }
                     }
-                    // Adicionando o usuario cadastrado
-                    val novoUsuario = Usuario(
-                        nome = nome,
-                        dataNascimento = dataNascimento,
-                        sexo = sexoEscolhido,
-                        email = email,
-                        senha = senha,
-                        organizador = organizador,
-                        cnpj = cnpj,
-                        razaoSocial = razaoSocial,
-                        nomeFantasia = nomeFantasia
-                    )
-
-                    listaUsuarios.add(novoUsuario)
-                    println(">> Usuário cadastrado com sucesso!\n")
                 }
             }
-
             "0" -> {
                 println("Sessão finalizada.")
                 continuar = false
             }
 
             else -> {
-                println("Opção inválida! Tente novamente.\n")
+                println("ERRO: Opção inválida. Tente novamente.")
             }
         }
     }
