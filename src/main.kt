@@ -24,6 +24,7 @@ fun main() {
     while (continuar) {
         println("MENU PRINCIPAL")
         println("1. Cadastrar Usuário")
+        println("2. Alterar Usuário")
         println("0. Sair")
 
         print("Digite: ")
@@ -66,7 +67,7 @@ fun main() {
                             "2" -> Sexo.FEMININO
                             else -> Sexo.NAO_INFORMADO
                         }
-                        println("SEXO DEFINIDO $cadastroSexo.")
+                        println("OK: SEXO DEFINIDO $cadastroSexo.")
 
                         // Verifica se é usuário organizador
                         println("Você é organizador de eventos? [1] SIM, [2] NÃO")
@@ -77,7 +78,7 @@ fun main() {
                             "1" -> Tipo.ORGANIZADOR
                             else -> Tipo.COMUM
                         }
-                        println("DEFINIDO USUÁRIO $cadastroOrganizador.")
+                        println("OK: DEFINIDO USUÁRIO $cadastroOrganizador.")
 
                         // Variaveis para cadastrar empresas
                         val cadastroEmpresa: String
@@ -95,7 +96,7 @@ fun main() {
 
                                 when (cadastroEmpresa) {
                                     "1" -> {
-                                        println("CADASTRO DE EMPRESA")
+                                        println("\nCADASTRO DE EMPRESA")
                                         print("Digite CNPJ: ")
                                         cadastroCNPJ = readln()
 
@@ -105,8 +106,10 @@ fun main() {
                                         print("Digite Nome Fantasia: ")
                                         cadastroFantasia = readln()
                                     }
-                                    else -> println("DEFINIDO USUÁRIO SEM EMPRESA.")
+                                    else -> println("OK: DEFINIDO USUÁRIO SEM EMPRESA.")
                                 }
+                            }
+                        }
                                 // Adicionando o usuario cadastrado
                                 val cadastroUsuario = Usuario(
                                     nome = cadastroNome,
@@ -121,14 +124,127 @@ fun main() {
                                 )
 
                                 listaUsuarios.add(cadastroUsuario)
-                                println("USUÁRIO CADASTRADO COM SUCESSO.")
-                            }
-                        }
+                                println("OK: USUÁRIO CADASTRADO COM SUCESSO.\n")
                     }
                 }
             }
+            "2" ->  {
+                println("\nALTERAR CADASTRO")
+                print("Digite o e-mail da sua conta: ")
+                val buscarEmail = readln()
+                print("Digite a senha da sua conta: ")
+                val buscarSenha = readln()
+
+                // Cria variável associada com o data class Usuario
+                var usuarioEncontrado: Usuario? = null
+
+                // Busca na lista de usuários
+                for (usuario in listaUsuarios) {
+                    when {
+                        usuario.email == buscarEmail && usuario.senha == buscarSenha -> usuarioEncontrado = usuario
+                    }
+                }
+                val tipo = usuarioEncontrado?.tipoUsuario
+                // Execução para usuário (separado por tipo) depois da busca
+                when (tipo) {
+                    Tipo.COMUM -> {
+                        println("OK: Alterando ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
+                        println("ALTERAR DADOS")
+                        println("[1] Nome [2] Data de nascimento [3] Sexo [4] Senha")
+                        print("Digite: ")
+                        val opcaoAlterar = readln()
+                        println("")
+                        when (opcaoAlterar) {
+                            "1" -> {
+                                print("Digite Nome: ")
+                                usuarioEncontrado.nome = readln()
+                                println("OK: Nome atualizado para ${usuarioEncontrado.nome}.")
+                            }
+                            "2" -> {
+                                print("Digite Data de nascimento (DD/MM/AAAA): ")
+                                usuarioEncontrado.dataNascimento = readln()
+                                println("OK: Data de nascimento atualizada para ${usuarioEncontrado.dataNascimento}.")
+                            }
+                            "3" -> {
+                                println("Digite Sexo: [1] MASCULINO, [2] FEMININO, [3] NÃO INFORMADO")
+                                val alterarSexo = readln()
+                                usuarioEncontrado.sexo = when (alterarSexo) {
+                                    "1" -> Sexo.MASCULINO
+                                    "2" -> Sexo.FEMININO
+                                    else -> Sexo.NAO_INFORMADO
+                                }
+                                println("OK: Sexo atualizado para ${usuarioEncontrado.sexo}.")
+                            }
+                            "4" -> {
+                                print("Digite Senha: ")
+                                usuarioEncontrado.senha = readln()
+                                print("Confirme Senha: ")
+                                val confirmarSenha = readln()
+                                when {usuarioEncontrado.senha == confirmarSenha -> println("OK: Senha atualizada.")
+                                else -> println("ERRO: Senhas diferentes. Solicite nova alteração.")}
+                            }
+                            else -> println("ERRO: Opção inválida. Solicite nova alteração.")
+                        }
+                    }
+                    Tipo.ORGANIZADOR -> {
+                        println("Usuário: ${usuarioEncontrado.nome}")
+                        println("ALTERAR CADASTRO")
+                        println("[1] Nome [2] Data de nascimento [3] Sexo [4] Senha \n[5] CNPJ [6] Razão Social [7] Nome Fantasia")
+                        print("Opção: ")
+                        val opcaoAlterar = readln()
+
+                        when (opcaoAlterar) {
+                            "1" -> {
+                                print("Digite Nome: ")
+                                usuarioEncontrado.nome = readln()
+                                println("OK: Nome atualizado para ${usuarioEncontrado.nome}.")
+                            }
+                            "2" -> {
+                                print("Digite Data de nascimento (DD/MM/AAAA): ")
+                                usuarioEncontrado.dataNascimento = readln()
+                                println("OK: Data de nascimento atualizada para ${usuarioEncontrado.dataNascimento}.")
+                            }
+                            "3" -> {
+                                println("Digite Sexo: [1] MASCULINO, [2] FEMININO, [3] NÃO INFORMADO")
+                                val alterarSexo = readln()
+                                usuarioEncontrado.sexo = when (alterarSexo) {
+                                    "1" -> Sexo.MASCULINO
+                                    "2" -> Sexo.FEMININO
+                                    else -> Sexo.NAO_INFORMADO
+                                }
+                                println("OK: Sexo atualizado para ${usuarioEncontrado.sexo}.")
+                            }
+                            "4" -> {
+                                print("Digite Senha: ")
+                                usuarioEncontrado.senha = readln()
+                                print("Confirme Senha: ")
+                                val confirmarSenha = readln()
+                                when {usuarioEncontrado.senha == confirmarSenha -> println("OK: Senha atualizada.")
+                                    else -> println("ERRO: Senhas diferentes. Solicite nova alteração.")}
+                            }
+                            "5" -> {
+                                print("Digite CNPJ: ")
+                                usuarioEncontrado.cnpj = readln()
+                                println("OK: CNPJ atualizado para ${usuarioEncontrado.cnpj}.")
+                            }
+                            "6" -> {
+                                print("Digite Razão Social: ")
+                                usuarioEncontrado.razaoSocial = readln()
+                                println("OK: Razão Social atualizada para ${usuarioEncontrado.razaoSocial}.")
+                            }
+                            "7" -> {
+                                print("Digite Nome Fantasia: ")
+                                usuarioEncontrado.nomeFantasia = readln()
+                                println("OK: Nome Fantasia atualizado para ${usuarioEncontrado.nomeFantasia}.")
+                            }
+                        }
+                        println("OK: Operação finalizada.\n")
+                    }
+                    else -> println("ERRO: Email e/ou senha incorretos. Solicite nova alteração.")
+                }
+            }
             "0" -> {
-                println("Sessão finalizada.")
+                print("OK: Operação finalizada.")
                 continuar = false
             }
 
