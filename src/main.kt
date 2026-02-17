@@ -47,17 +47,32 @@ fun main() {
     // Configurando memória local
     val listaUsuarios = mutableListOf<Usuario>()
     val listaEventos = mutableListOf<Evento>()
+    var dataValida: Boolean
+    var diaHoje: Int
+    var mesHoje: Int
+    var anoHoje: Int
+    var dataHoje: Int
 
     println("BEM-VINDO AO DENDÊ EVENTOS")
-    println("MENU: DEFINIR DATA DE HOJE")
-    print("Digite Dia (DD): ")
-    var diaHoje = readln().toIntOrNull() ?: 20
-    print("Digite Mês (MM): ")
-    var mesHoje = readln().toIntOrNull() ?: 2
-    print("Digite Ano (AAAA): ")
-    var anoHoje = readln().toIntOrNull() ?: 2026
+
+    // Loop de definir data
+    do{
+        println("MENU: DEFINIR DATA DE HOJE")
+        print("Digite Dia (DD): ")
+        diaHoje = readln().toIntOrNull() ?: 0
+        print("Digite Mês (MM): ")
+        mesHoje = readln().toIntOrNull() ?: 0
+        print("Digite Ano (AAAA): ")
+        anoHoje = readln().toIntOrNull() ?: 0
+
+        dataValida = false
+        when {
+            diaHoje in 1..31 && mesHoje in 1..12 && anoHoje >= 2026 -> dataValida = true
+            else -> println("ERRO: Data inválida. Tente novamente.")
+        }
+    } while (!dataValida)
     println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.")
-    var dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
+    dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
 
     // Loop do menu inicial
     do {
@@ -486,7 +501,7 @@ fun main() {
                                                 }
                                             }
                                         }
-                                        print("[QUALQUER TECLA] Encerrar Sessão\n")
+                                        print("[QUALQUER TECLA] Voltar\n")
                                         readln()
                                     }
 
@@ -1066,46 +1081,52 @@ fun main() {
                                                         }
                                                     }
                                                 }
-                                            }
+                                                // Busca o evento selecionado
+                                                when (possuiEventos) {
+                                                    false -> println("ERRO: Nenhum evento encontrado.")
+                                                    true -> {
+                                                        print("Digite o ID do evento a desativar: ")
+                                                        val idEvento = readln().toIntOrNull() ?: 0
 
-                                            TipoUsuario.COMUM -> println("ERRO: Opção inválida. Tente novamente.")
-                                        }
-
-                                        // Busca o evento selecionado
-                                        when (possuiEventos) {
-                                            false -> println("ERRO: Nenhum evento encontrado.")
-                                            true -> {
-                                                print("Digite o ID do evento a desativar: ")
-                                                val idEvento = readln().toIntOrNull() ?: 0
-
-                                                // Variável e loop para selecionar o evento a ser alterado
-                                                var eventoAlterando: Evento? = null
-                                                for (evento in listaEventos) {
-                                                    when {
-                                                        evento.id == idEvento && evento.organizadorEmail == usuarioEncontrado.email -> eventoAlterando = evento
-                                                    }
-                                                }
-                                                when (eventoAlterando) {
-                                                    null -> println("ERRO: Evento inválido. Tente novamente.")
-                                                    else -> {
-                                                        println("Desativar o evento ${eventoAlterando.nome}? [1] SIM [2] NÃO: ")
-                                                        print("Digite opção: ")
-                                                        val desativarEvento = readln()
-
-                                                        when (desativarEvento) {
-                                                            "1" -> {
-                                                                eventoAlterando.statusEvento = false
-                                                                println("\nOK: Evento desativado (${eventoAlterando.nome}).")
+                                                        // Variável e loop para selecionar o evento a ser alterado
+                                                        var eventoAlterando: Evento? = null
+                                                        for (evento in listaEventos) {
+                                                            when {
+                                                                evento.id == idEvento && evento.organizadorEmail == usuarioEncontrado.email -> eventoAlterando = evento
                                                             }
+                                                        }
+                                                        when (eventoAlterando) {
+                                                            null -> println("ERRO: Evento inválido. Tente novamente.")
+                                                            else -> {
+                                                                println("Desativar o evento ${eventoAlterando.nome}? [1] SIM [2] NÃO: ")
+                                                                print("Digite opção: ")
+                                                                val desativarEvento = readln()
 
-                                                            "2" -> println("OK: Operação cancelada.")
-                                                            else -> println("ERRO: Opção inválida. Tente novamente.")
+                                                                when (desativarEvento) {
+                                                                    "1" -> {
+                                                                        eventoAlterando.statusEvento = false
+                                                                        println("\nOK: Evento desativado (${eventoAlterando.nome}).")
+                                                                    }
+
+                                                                    "2" -> println("OK: Operação cancelada.")
+                                                                    else -> println("ERRO: Opção inválida. Tente novamente.")
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
+
+                                            TipoUsuario.COMUM -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
+
+                                    "0" -> {
+                                        println("OK: Sessão encerrada.")
+                                        opcaoMenuLogado = "0"
+                                    }
+
+                                    else -> println("ERRO: Opção inválida. Tente novamente.")
                                 }
                             } while (opcaoMenuLogado != "0")
                         }
@@ -1114,14 +1135,22 @@ fun main() {
             }
 
             "3" -> {
-                println("\nAJUSTAR DATA ($diaHoje/$mesHoje/$anoHoje)")
-                print("Digite Dia Atualizado (DD): ")
-                diaHoje = readln().toIntOrNull() ?: 20
-                print("Digite Mês Atualizado (MM): ")
-                mesHoje = readln().toIntOrNull() ?: 2
-                print("Digite Ano Atualizado (AAAA): ")
-                anoHoje = readln().toIntOrNull() ?: 2026
-                println("OK: Data atualizada para $diaHoje/$mesHoje/$anoHoje.\n")
+                do {
+                    println("MENU: DEFINIR DATA DE HOJE")
+                    print("Digite Dia (DD): ")
+                    diaHoje = readln().toIntOrNull() ?: 0
+                    print("Digite Mês (MM): ")
+                    mesHoje = readln().toIntOrNull() ?: 0
+                    print("Digite Ano (AAAA): ")
+                    anoHoje = readln().toIntOrNull() ?: 0
+
+                    dataValida = false
+                    when {
+                        diaHoje in 1..31 && mesHoje in 1..12 && anoHoje >= 2026 -> dataValida = true
+                        else -> println("ERRO: Data inválida. Tente novamente.")
+                    }
+                } while (!dataValida)
+                println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.")
                 dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
             }
 
