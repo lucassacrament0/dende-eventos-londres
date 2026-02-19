@@ -52,6 +52,7 @@ data class Ingresso(
 )
 
 fun main() {
+
     // Configurando memória local
     val listaUsuarios = mutableListOf<Usuario>()
     val listaEventos = mutableListOf<Evento>()
@@ -64,7 +65,7 @@ fun main() {
 
     println("BEM-VINDO AO DENDÊ EVENTOS")
 
-    // Loop de definir data
+    // Loop de definir e validar data
     do {
         println("MENU: DEFINIR DATA DE HOJE")
         print("Digite Somente Dia (DD): ")
@@ -80,7 +81,7 @@ fun main() {
             else -> println("ERRO: Data inválida. Tente novamente.")
         }
     } while (!dataValida)
-    println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.")
+    println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.\n")
     dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
 
     // Loop do menu inicial
@@ -94,6 +95,7 @@ fun main() {
         print("Digite opção: ")
         val opcaoInicio = readln()
 
+        // Opções do menu
         when (opcaoInicio) {
             "1" -> {
                 println("\nCADASTRAR USUÁRIO")
@@ -163,6 +165,7 @@ fun main() {
                             dataValida = true
                             cadastroNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
                         }
+
                         else -> println("ERRO: Data inválida. Tente novamente.")
                     }
                 } while (!dataValida)
@@ -177,10 +180,11 @@ fun main() {
                     print("Confirme Nova Senha: ")
                     val confirmarSenha = readln()
                     when {
-                        cadastroSenha == confirmarSenha -> println("OK: SENHA DEFINIDA.\n")
-                        else -> println("ERRO: Senhas não conferem. Tente novamente.\n")
+                        cadastroSenha.length < 8 -> println("ERRO: A senha deve ter no mínimo 8 caracteres.\n")
+                        cadastroSenha != confirmarSenha -> println("ERRO: Senhas não conferem. Tente novamente.\n")
+                        else -> println("OK: SENHA DEFINIDA.\n")
                     }
-                } while (cadastroSenha != confirmarSenha)
+                } while (cadastroSenha.length < 8 || cadastroSenha != confirmarSenha)
 
                 // Define o sexo (Utiliza o enum para limitar as opções)
                 println("Sexo: [1] MASCULINO, [2] FEMININO, [3] PREFIRO NÃO INFORMAR")
@@ -214,6 +218,7 @@ fun main() {
                 // Para os organizadores...
                 when (tipoUsuario) {
                     "1" -> {
+
                         // Verifica se tem empresa
                         println("Você possui uma empresa? [1] SIM [2] NÃO")
                         print("Digite opção: ")
@@ -222,8 +227,19 @@ fun main() {
                         when (cadastroEmpresa) {
                             "1" -> {
                                 println("\nCADASTRO DE EMPRESA")
-                                print("Digite CNPJ: ")
-                                cadastroCNPJ = readln()
+
+                                // Variável e loop para validar o CNPJ
+                                var cnpjValido = false
+                                do {
+                                    print("Digite CNPJ (14 dígitos): ")
+                                    cadastroCNPJ = readln()
+
+                                    when {
+                                        cadastroCNPJ.length == 14 -> cnpjValido = true
+                                        else -> println("ERRO: CNPJ inválido. Tente novamente.\n")
+                                    }
+                                } while (!cnpjValido)
+                                println("OK: CNPJ DEFINIDO '$cadastroCNPJ'.\n")
 
                                 print("Digite Razão Social: ")
                                 cadastroRazao = readln().uppercase()
@@ -236,6 +252,7 @@ fun main() {
                         }
                     }
                 }
+
                 // Adicionando o usuario cadastrado
                 val cadastroUsuario = Usuario(
                     statusConta = true,
@@ -254,6 +271,7 @@ fun main() {
             }
 
             "2" -> {
+
                 // Cria variável associada com o data class Usuario
                 var usuarioEncontrado: Usuario? = null
 
@@ -269,6 +287,7 @@ fun main() {
                         usuario.email == buscarEmail && usuario.senha == buscarSenha -> usuarioEncontrado = usuario
                     }
                 }
+
                 // Se o usuário não foi localizado, mostra mensagem de erro
                 when {
                     usuarioEncontrado == null -> println("ERRO: E-mail e/ou senha incorretos. Solicite novamente.\n")
@@ -288,29 +307,34 @@ fun main() {
                             }
                         }
 
+                        // Se a conta estiver ativa...
                         usuarioEncontrado.statusConta -> {
                             println("OK: Acesso bem-sucedido.\n")
                             do {
                                 println("MENU PRINCIPAL - ÁREA LOGADA ($diaHoje/$mesHoje/$anoHoje)")
                                 println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                                 println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
+
+                                // Condicional para tornar menu dinâmico com base no tipo de usuário
                                 when {
                                     usuarioEncontrado.tipoUsuario == TipoUsuario.COMUM -> {
-                                        println("[4] Feed de Eventos [5] Comprar Ingresso")
+                                        println("[4] Feed de Eventos [5] Visualizar Ingressos")
                                     }
 
                                     usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                                        println("[7] Cadastrar Evento [8] Visualizar Eventos [9] Alterar Evento [10] Desativar Evento")
+                                        println("[6] Cadastrar Evento [7] Visualizar Eventos [8] Alterar Evento [9] Desativar Evento")
                                     }
                                 }
                                 println("[0] Encerrar Sessão")
                                 println("Digite opção: ")
                                 var opcaoMenuLogado = readln()
 
+                                // Opções do menu logado
                                 when (opcaoMenuLogado) {
                                     "1" -> {
                                         var menuAlterarUsuario = true
-                                        // Alterar dados de conta ativada
+
+                                        // Alterar dados de conta ativa
                                         do {
                                             println("MENU: Alterando ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                                             println("OPÇÕES:")
@@ -336,6 +360,8 @@ fun main() {
                                                 }
 
                                                 "2" -> {
+
+                                                    // Loop e validação de data de nascimento
                                                     do {
                                                         println("MENU: ALTERAR DATA DE NASCIMENTO")
                                                         print("Digite Somente Dia de Nascimento (DD): ")
@@ -351,6 +377,7 @@ fun main() {
                                                                 dataValida = true
                                                                 usuarioEncontrado.dataNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
                                                             }
+
                                                             else -> println("ERRO: Data inválida. Tente novamente.")
                                                         }
                                                     } while (!dataValida)
@@ -370,23 +397,41 @@ fun main() {
                                                 }
 
                                                 "4" -> {
+
+                                                    // Variável e loop para inserir senha (validar com duas etapas)
+                                                    var cadastroSenha: String
                                                     do {
                                                         print("OK: Digite Senha atualizada: ")
-                                                        usuarioEncontrado.senha = readln()
+                                                        cadastroSenha = readln()
                                                         print("Confirme Senha atualizada: ")
                                                         val confirmarSenha = readln()
                                                         when {
-                                                            usuarioEncontrado.senha == confirmarSenha -> println("OK: SENHA ATUALIZADA.\n")
-                                                            else -> println("ERRO: Senhas não conferem. Tente novamente.")
+                                                            cadastroSenha.length < 8 -> println("ERRO: A senha deve ter no mínimo 8 caracteres.\n")
+                                                            cadastroSenha != confirmarSenha -> println("ERRO: Senhas não conferem. Tente novamente.")
+                                                            else -> println("OK: SENHA ATUALIZADA.\n")
                                                         }
-                                                    } while (usuarioEncontrado.senha != confirmarSenha)
+                                                    } while (cadastroSenha.length < 8 || cadastroSenha != confirmarSenha)
+                                                    usuarioEncontrado.senha = cadastroSenha
                                                 }
 
                                                 "5" -> {
+
+                                                    // Validação de usuário (organizador) e loop para validar CNPJ
                                                     when {
                                                         usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                                                            print("OK: Digite CNPJ atualizado: ")
-                                                            usuarioEncontrado.cnpj = readln()
+                                                            var cnpjValido = false
+                                                            var alterarCNPJ: String
+                                                            do {
+                                                                print("Digite CNPJ atualizado (14 dígitos): ")
+                                                                alterarCNPJ = readln()
+
+                                                                when {
+                                                                    alterarCNPJ.length == 14 -> cnpjValido = true
+                                                                    else -> println("ERRO: CNPJ inválido. Tente novamente.\n")
+                                                                }
+                                                            } while (!cnpjValido)
+
+                                                            usuarioEncontrado.cnpj = alterarCNPJ
                                                             println("OK: CNPJ DEFINIDO '${usuarioEncontrado.cnpj}'.\n")
                                                         }
 
@@ -424,6 +469,8 @@ fun main() {
                                     }
 
                                     "2" -> {
+
+                                        // Variáveis e condicional para dividir a data de nascimento (String) em 3 partes
                                         var diaInt = 0
                                         var mesInt = 0
                                         var anoInt = 0
@@ -435,6 +482,7 @@ fun main() {
                                                 anoInt = parteData[2].toInt()
                                             }
                                         }
+
                                         // Cálculo da idade com base na data de hoje (informada) e nascimento cadastrado
                                         var idadeDia = diaHoje - diaInt
                                         var idadeMes = mesHoje - mesInt
@@ -461,6 +509,8 @@ fun main() {
                                         println("Data de Nascimento: ${usuarioEncontrado.dataNascimento}")
                                         println("≈ $idadeAno anos, $idadeMes meses e $idadeDia dias")
                                         println("Sexo: ${usuarioEncontrado.sexo}")
+
+                                        // Dados específicos para organizadores
                                         when {
                                             usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
                                                 println("EMPRESA")
@@ -495,7 +545,8 @@ fun main() {
 
                                         when (desativarConta) {
                                             "1" -> {
-                                                // Verifica se é organizador e tem eventos ativados
+
+                                                // Verifica se é usuário organizador e busca por eventos ativados
                                                 var possuiEventos = false
                                                 when (usuarioEncontrado.tipoUsuario) {
                                                     TipoUsuario.ORGANIZADOR -> {
@@ -509,6 +560,8 @@ fun main() {
 
                                                     else -> possuiEventos = false
                                                 }
+
+                                                // Caso haja eventos ativos para o organizador, não desativa a conta
                                                 when (possuiEventos) {
                                                     true -> println("ERRO: Você tem eventos ativos. Desativação não permitida.")
                                                     false -> {
@@ -533,9 +586,11 @@ fun main() {
                                                 val eventosDisponiveis = mutableListOf<Evento>()
 
                                                 for (evento in listaEventos) {
+
                                                     // Condensa dia/mes/ano do evento em uma data completa (como dataHoje)
                                                     val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
 
+                                                    // Busca por eventos lotados para não exibir na lista
                                                     var ingressosVendidos = 0
                                                     for (ingresso in listaIngressos) {
                                                         when {
@@ -557,6 +612,7 @@ fun main() {
                                                 println("\nDados em ordem:")
                                                 println("ID | NOME | DATA | LOCAL | PREÇO | INGRESSOS")
 
+                                                // Define eventos com ingressos disponíveis para exibir em lista
                                                 var existemEventos = false
                                                 for (evento in eventosDisponiveis) {
                                                     var ingressosVendidos = 0
@@ -565,6 +621,8 @@ fun main() {
                                                             ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
                                                         }
                                                     }
+
+                                                    // Calcula a quantidade de ingressos disponíveis
                                                     val ingressosDisponiveis = evento.capacidadeMax - ingressosVendidos
                                                     println(
                                                         "${evento.id} | ${evento.nome} | ${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} | " +
@@ -573,10 +631,11 @@ fun main() {
                                                     existemEventos = true
                                                 }
 
+                                                // Se eventos existirem na lista, possibilita expandir um evento
                                                 when (existemEventos) {
                                                     false -> println("AVISO: Nenhum evento encontrado.")
                                                     true -> {
-                                                        print("\nDigite ID para ver evento ou [0] Voltar: ")
+                                                        print("\nDigite ID do evento para expandir/comprar ingresso (ou [0] Voltar): ")
                                                         val opcaoID = readln().toIntOrNull() ?: 0
 
                                                         when (opcaoID) {
@@ -584,12 +643,14 @@ fun main() {
                                                             else -> {
                                                                 var eventoDetalhes: Evento? = null
 
+                                                                // Busca pelo ID inserido para expandir evento
                                                                 for (evento in listaEventos) {
                                                                     when {
                                                                         evento.id == opcaoID && evento.statusEvento -> eventoDetalhes = evento
                                                                     }
                                                                 }
 
+                                                                // Com base no ID inserido, exibe detalhes do evento ou não
                                                                 when (eventoDetalhes) {
                                                                     null -> println("ERRO: Nenhum evento encontrado.")
                                                                     else -> {
@@ -610,6 +671,7 @@ fun main() {
                                                                         println("Capacidade Máxima: ${eventoDetalhes.capacidadeMax}")
                                                                         println("Preço do Ingresso: R$ ${eventoDetalhes.precoIngresso}")
 
+                                                                        // Substitui exibição "true" ou "false" por "Sim" ou "Não"
                                                                         val textoEstorno = when (eventoDetalhes.aceitaEstorno) {
                                                                             true -> "Sim (Taxa: ${eventoDetalhes.taxaEstorno}%)"
                                                                             false -> "Não"
@@ -622,8 +684,121 @@ fun main() {
                                                                         }
                                                                         println("Evento Atual ID ${eventoDetalhes.id}")
 
-                                                                        print("[QUALQUER TECLA] Voltar.\n")
-                                                                        readln()
+                                                                        // Mostra opção de comprar ingresso do evento exibido e opção voltar
+                                                                        println("[1] Comprar Ingresso  [0] Voltar")
+                                                                        print("Digite opção: ")
+                                                                        val opcaoCompra = readln()
+
+                                                                        when (opcaoCompra) {
+                                                                            "1" -> {
+
+                                                                                // Confirma a compra em caso de evento sem atribuição a outro
+                                                                                when (eventoDetalhes.idEventoPrincipal) {
+                                                                                    null -> {
+                                                                                        println("\nCOMPRAR INGRESSO")
+                                                                                        println("\nEvento: ${eventoDetalhes.nome}")
+                                                                                        println("Preço Total: R$ ${eventoDetalhes.precoIngresso}")
+                                                                                        println("\n[1] Confirmar Compra  [0] Cancelar")
+                                                                                        print("Digite opção: ")
+                                                                                        val confirmar = readln()
+
+                                                                                        // Cria o ingresso, adicionando a data class Ingresso
+                                                                                        when (confirmar) {
+                                                                                            "1" -> {
+                                                                                                val novoIngresso = Ingresso(
+                                                                                                    id = listaIngressos.size + 1,
+                                                                                                    idEvento = eventoDetalhes.id,
+                                                                                                    emailUsuario = usuarioEncontrado.email,
+                                                                                                    statusDisponibilidade = false,
+                                                                                                    valorPago = eventoDetalhes.precoIngresso
+                                                                                                )
+                                                                                                listaIngressos.add(novoIngresso)
+                                                                                                println("OK: Ingresso comprado. (ID: ${novoIngresso.id})\n")
+                                                                                            }
+
+                                                                                            "0" -> println("OK: Compra cancelada.")
+                                                                                            else -> println("ERRO: Opção inválida.")
+                                                                                        }
+                                                                                    }
+
+                                                                                    // Valida o ID de evento digitado
+                                                                                    else -> {
+                                                                                        var eventoPrincipal: Evento? = null
+                                                                                        for (evento in listaEventos) {
+                                                                                            when {
+                                                                                                evento.id == eventoDetalhes.idEventoPrincipal && evento.statusEvento -> eventoPrincipal = evento
+                                                                                            }
+                                                                                        }
+
+                                                                                        when (eventoPrincipal) {
+                                                                                            null -> println("ERRO: Evento inexistente ou indisponível.\n")
+
+                                                                                            // Calcula se o evento principal tem ingressos disponíveis
+                                                                                            else -> {
+                                                                                                var vendidosPrincipal = 0
+                                                                                                for (ingresso in listaIngressos) {
+                                                                                                    when {
+                                                                                                        ingresso.idEvento == eventoPrincipal.id && !ingresso.statusDisponibilidade -> vendidosPrincipal++
+                                                                                                    }
+                                                                                                }
+                                                                                                val ingressosPrincipal = eventoPrincipal.capacidadeMax - vendidosPrincipal
+
+                                                                                                when {
+                                                                                                    ingressosPrincipal <= 0 -> println("ERRO: Evento Principal '${eventoPrincipal.nome}' indisponível.")
+
+                                                                                                    // Confirma a compra em caso de sub-evento com atribuição a evento principal
+                                                                                                    else -> {
+                                                                                                        val ingressosSomados = eventoDetalhes.precoIngresso + eventoPrincipal.precoIngresso
+                                                                                                        println("\nAVISO: Este evento exige compra dupla.")
+                                                                                                        println("- Sub-Evento: ${eventoDetalhes.nome} (R$ ${eventoDetalhes.precoIngresso})")
+                                                                                                        println("- Evento Principal:  ${eventoPrincipal.nome} (R$ ${eventoPrincipal.precoIngresso})")
+                                                                                                        println("VALOR TOTAL:  R$ $ingressosSomados")
+
+                                                                                                        println("\n[1] Confirmar Compra Dupla  [0] Cancelar")
+                                                                                                        print("Digite opção: ")
+                                                                                                        val confirmarDupla = readln()
+
+                                                                                                        when (confirmarDupla) {
+                                                                                                            "1" -> {
+
+                                                                                                                // Cria os ingressos, adicionando-os a data class Ingresso
+                                                                                                                val ingressoSubEvento = Ingresso(
+                                                                                                                    id = listaIngressos.size + 1,
+                                                                                                                    idEvento = eventoDetalhes.id,
+                                                                                                                    emailUsuario = usuarioEncontrado.email,
+                                                                                                                    statusDisponibilidade = false,
+                                                                                                                    valorPago = eventoDetalhes.precoIngresso
+                                                                                                                )
+                                                                                                                listaIngressos.add(ingressoSubEvento)
+
+                                                                                                                val ingressoEventoPrincipal = Ingresso(
+                                                                                                                    id = listaIngressos.size + 1,
+                                                                                                                    idEvento = eventoPrincipal.id,
+                                                                                                                    emailUsuario = usuarioEncontrado.email,
+                                                                                                                    statusDisponibilidade = false,
+                                                                                                                    valorPago = eventoPrincipal.precoIngresso
+                                                                                                                )
+                                                                                                                listaIngressos.add(ingressoEventoPrincipal)
+
+                                                                                                                println("OK: Dois ingressos comprados.")
+                                                                                                                println("1. Ingresso ID ${ingressoSubEvento.id} (${eventoDetalhes.nome})")
+                                                                                                                println("2. Ingresso ID ${ingressoEventoPrincipal.id} (${eventoPrincipal.nome})\n")
+                                                                                                            }
+
+                                                                                                            "0" -> println("OK: Compra cancelada.")
+                                                                                                            else -> println("ERRO: Opção inválida.")
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            "0" -> println("OK: Operação cancelada.\n")
+                                                                            else -> println("ERRO: Opção inválida. Tente novamente.\n")
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -631,35 +806,45 @@ fun main() {
                                                     }
                                                 }
                                             }
+
                                             TipoUsuario.ORGANIZADOR -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
+
                                     "5" -> {
                                         when (usuarioEncontrado.tipoUsuario) {
                                             TipoUsuario.COMUM -> {
-                                                println("\nCOMPRAR INGRESSO")
-                                                print("Digite o ID do evento que deseja comprar: ")
-                                                val idComprando = readln().toIntOrNull() ?: 0
+                                                println("\nVISUALIZAR INGRESSOS")
+                                                var possuiIngressos = false
 
-                                                var eventoComprando: Evento? = null
-                                                var ingressosRestantes: Int
-
+                                                // Lista (temporária) de eventos com ingresso(s)
+                                                val eventosOrdenados = mutableListOf<Evento>()
                                                 for (evento in listaEventos) {
-                                                    when (evento.id) {
-                                                        idComprando -> {
-                                                            val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
-                                                            when {
-                                                                evento.statusEvento && dataEvento >= dataHoje -> {
-                                                                    var ingressosVendidos = 0
-                                                                    for (ingresso in listaIngressos) {
-                                                                        when {
-                                                                            ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
-                                                                        }
-                                                                    }
-                                                                    ingressosRestantes = evento.capacidadeMax - ingressosVendidos
+                                                    eventosOrdenados.add(evento)
+                                                }
 
-                                                                    when {
-                                                                        ingressosRestantes > 0 -> eventoComprando = evento
+                                                // Ordenação da lista por data e nome
+                                                eventosOrdenados.sortWith(
+                                                    compareBy(
+                                                        { it.anoInicio }, { it.mesInicio }, { it.diaInicio }, { it.horaInicio }, { it.nome }
+                                                    ))
+
+                                                // Exibe ingressos ativos e futuros
+                                                for (evento in eventosOrdenados) {
+                                                    val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
+                                                    when {
+                                                        evento.statusEvento && dataEvento >= dataHoje -> {
+                                                            for (ingresso in listaIngressos) {
+                                                                when {
+                                                                    ingresso.emailUsuario == usuarioEncontrado.email &&
+                                                                            ingresso.idEvento == evento.id &&
+                                                                            !ingresso.statusDisponibilidade -> {
+                                                                        println(
+                                                                            "ID: ${ingresso.id} | Evento: ${evento.nome} | Data: ${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} " +
+                                                                                    "às ${evento.horaInicio}:${evento.minutoInicio} " +
+                                                                                    "| Valor: R$ ${ingresso.valorPago} | Status: [OK]"
+                                                                        )
+                                                                        possuiIngressos = true
                                                                     }
                                                                 }
                                                             }
@@ -667,92 +852,136 @@ fun main() {
                                                     }
                                                 }
 
-                                                when (eventoComprando) {
-                                                    null -> println("ERRO: Evento inexistente ou indisponível.")
-                                                    else -> {
-                                                        when (eventoComprando.idEventoPrincipal) {
-                                                            null -> {
-                                                                println("Evento: ${eventoComprando.nome}")
-                                                                println("Preço Total: R$ ${eventoComprando.precoIngresso}")
-                                                                println("\n[1] Confirmar Compra  [0] Cancelar")
-                                                                print("Digite opção: ")
-                                                                val confirmar = readln()
-
-                                                                when (confirmar) {
-                                                                    "1" -> {
-                                                                        val novoIngresso = Ingresso(
-                                                                            id = listaIngressos.size + 1,
-                                                                            idEvento = eventoComprando.id,
-                                                                            emailUsuario = usuarioEncontrado.email,
-                                                                            statusDisponibilidade = false,
-                                                                            valorPago = eventoComprando.precoIngresso
+                                                // Exibe ingressos cancelados e inativos
+                                                for (evento in eventosOrdenados) {
+                                                    val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
+                                                    for (ingresso in listaIngressos) {
+                                                        when {
+                                                            ingresso.emailUsuario == usuarioEncontrado.email && ingresso.idEvento == evento.id -> {
+                                                                when {
+                                                                    ingresso.statusDisponibilidade || !evento.statusEvento || dataEvento < dataHoje -> {
+                                                                        val statusTexto = when (ingresso.statusDisponibilidade) {
+                                                                            true -> "[CANCELADO]"
+                                                                            false -> "[REALIZADO/INATIVO]"
+                                                                        }
+                                                                        println(
+                                                                            "ID: ${ingresso.id} | Evento: ${evento.nome} | Data: ${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} " +
+                                                                                    "às ${evento.horaInicio}:${evento.minutoInicio} " +
+                                                                                    "| Valor: R$ ${ingresso.valorPago} | Status: $statusTexto"
                                                                         )
-                                                                        listaIngressos.add(novoIngresso)
-                                                                        println("OK: Ingresso comprado. (ID: ${novoIngresso.id})\n")
+                                                                        possuiIngressos = true
                                                                     }
-                                                                    "0" -> println("OK: Compra cancelada.")
-                                                                    else -> println("ERRO: Opção inválida.")
                                                                 }
                                                             }
+                                                        }
+                                                    }
+                                                }
+
+                                                when (possuiIngressos) {
+                                                    false -> println("AVISO: Você não possui ingressos.")
+
+                                                    // Possibilita expandir um ingresso
+                                                    true -> {
+                                                        print("\nDigite ID do ingresso para expandir/cancelar (ou [0] Voltar): ")
+                                                        val idIngresso = readln().toIntOrNull() ?: 0
+
+                                                        when (idIngresso) {
+                                                            0 -> println("OK: Voltando ao Menu Principal.")
                                                             else -> {
-                                                                var eventoPrincipal: Evento? = null
-                                                                for (evento in listaEventos) {
-                                                                    when (evento.id) {
-                                                                        eventoComprando.idEventoPrincipal -> eventoPrincipal = evento
+                                                                var ingressoExpandido: Ingresso? = null
+                                                                for (ingresso in listaIngressos) {
+                                                                    when {
+                                                                        ingresso.id == idIngresso && ingresso.emailUsuario == usuarioEncontrado.email -> ingressoExpandido = ingresso
                                                                     }
                                                                 }
 
-                                                                when (eventoPrincipal) {
-                                                                    null -> println("ERRO: Evento inexistente ou indisponível.\n")
+                                                                when (ingressoExpandido) {
+                                                                    null -> println("ERRO: Ingresso inexistente ou indisponível.")
                                                                     else -> {
-                                                                        // Verifica se o evento principal tem ingressos disponíveis
-                                                                        var vendidosPrincipal = 0
-                                                                        for (ingresso in listaIngressos) {
-                                                                            when {
-                                                                                ingresso.idEvento == eventoPrincipal.id && !ingresso.statusDisponibilidade -> vendidosPrincipal++
+                                                                        var eventoDoIngresso: Evento? = null
+                                                                        for (evento in listaEventos) {
+                                                                            when (evento.id) {
+                                                                                ingressoExpandido.idEvento -> eventoDoIngresso = evento
                                                                             }
                                                                         }
-                                                                        val ingressosPrincipal = eventoPrincipal.capacidadeMax - vendidosPrincipal
 
-                                                                        when {
-                                                                            ingressosPrincipal <= 0 -> println("ERRO: Evento Principal '${eventoPrincipal.nome}' indisponível.")
+                                                                        when (eventoDoIngresso) {
+                                                                            null -> println("ERRO: Nenhum evento encontrado.")
                                                                             else -> {
-                                                                                val ingressosSomados = eventoComprando.precoIngresso + eventoPrincipal.precoIngresso
-                                                                                println("AVISO: Este evento exige compra dupla.")
-                                                                                println("- Sub-Evento: ${eventoComprando.nome} (R$ ${eventoComprando.precoIngresso})")
-                                                                                println("- Evento Principal:  ${eventoPrincipal.nome} (R$ ${eventoPrincipal.precoIngresso})")
-                                                                                println("VALOR TOTAL:  R$ $ingressosSomados")
+                                                                                println("\nDETALHES DO INGRESSO")
+                                                                                println("ID: ${ingressoExpandido.id}")
+                                                                                println("Evento: ${eventoDoIngresso.nome}")
+                                                                                println(
+                                                                                    "Data: ${eventoDoIngresso.diaInicio}/${eventoDoIngresso.mesInicio}/${eventoDoIngresso.anoInicio} " +
+                                                                                            "às ${eventoDoIngresso.horaInicio}:${eventoDoIngresso.minutoInicio}"
+                                                                                )
+                                                                                println("Local: ${eventoDoIngresso.local}")
+                                                                                println("Valor Pago: R$ ${ingressoExpandido.valorPago}")
 
-                                                                                println("\n[1] Confirmar Compra Dupla  [0] Cancelar")
+                                                                                val statusAtual = when (ingressoExpandido.statusDisponibilidade) {
+                                                                                    true -> "CANCELADO"
+                                                                                    false -> "OK"
+                                                                                }
+                                                                                println("Status Atual: $statusAtual")
+
+                                                                                // Possibilita cancelar o ingresso atual
+                                                                                println("Cancelar Ingresso? [1] SIM [2] NÃO:")
                                                                                 print("Digite opção: ")
-                                                                                val confirmarDupla = readln()
+                                                                                val opcaoCancelamento = readln()
 
-                                                                                when (confirmarDupla) {
+                                                                                when (opcaoCancelamento) {
                                                                                     "1" -> {
-                                                                                        val ingressoSubEvento = Ingresso(
-                                                                                            id = listaIngressos.size + 1,
-                                                                                            idEvento = eventoComprando.id,
-                                                                                            emailUsuario = usuarioEncontrado.email,
-                                                                                            statusDisponibilidade = false,
-                                                                                            valorPago = eventoComprando.precoIngresso
-                                                                                        )
-                                                                                        listaIngressos.add(ingressoSubEvento)
 
-                                                                                        val ingressoEventoPrincipal = Ingresso(
-                                                                                            id = listaIngressos.size + 1,
-                                                                                            idEvento = eventoPrincipal.id,
-                                                                                            emailUsuario = usuarioEncontrado.email,
-                                                                                            statusDisponibilidade = false,
-                                                                                            valorPago = eventoPrincipal.precoIngresso
-                                                                                        )
-                                                                                        listaIngressos.add(ingressoEventoPrincipal)
+                                                                                        // Cria validação de data para validar cancelamento de ingresso somente para eventos futuros
+                                                                                        val dataEvento = (eventoDoIngresso.anoInicio * 10000) + (eventoDoIngresso.mesInicio * 100) + eventoDoIngresso.diaInicio
 
-                                                                                        println("OK: Dois ingressos comprados.")
-                                                                                        println("1. Ingresso ID ${ingressoSubEvento.id} (${eventoComprando.nome})")
-                                                                                        println("2. Ingresso ID ${ingressoEventoPrincipal.id} (${eventoPrincipal.nome})\n")
+                                                                                        when {
+                                                                                            ingressoExpandido.statusDisponibilidade -> println("\nERRO: Ingresso já cancelado.")
+                                                                                            dataEvento < dataHoje -> println("\nERRO: Evento passado. Cancelamento indisponível.")
+                                                                                            !eventoDoIngresso.statusEvento -> println("\nERRO: Evento desativado pelo organizador.")
+                                                                                            else -> {
+                                                                                                println("\nCANCELAMENTO DE INGRESSO")
+                                                                                                println("Sobre o Evento:")
+
+                                                                                                var valorReembolso = 0.0
+
+                                                                                                // Exibe para o usuário se o ingresso pode ser reembolsado ou não
+                                                                                                when (eventoDoIngresso.aceitaEstorno) {
+                                                                                                    true -> {
+                                                                                                        val descontoTaxa = (ingressoExpandido.valorPago * eventoDoIngresso.taxaEstorno) / 100
+                                                                                                        valorReembolso = ingressoExpandido.valorPago - descontoTaxa
+                                                                                                        println("- Aceita Reembolso: SIM")
+                                                                                                        println("- Taxa de Retenção: ${eventoDoIngresso.taxaEstorno}%")
+                                                                                                        println("- Valor a ser estornado: R$ $valorReembolso")
+                                                                                                    }
+
+                                                                                                    false -> {
+                                                                                                        println("- Aceita Reembolso: NÃO")
+                                                                                                        println("- O cancelamento não devolve valores.")
+                                                                                                    }
+                                                                                                }
+
+                                                                                                // Confirma o cancelamento do ingresso
+                                                                                                println("\nDeseja realmente cancelar este ingresso? [1] SIM [2] NÃO: ")
+                                                                                                print("Digite opção:")
+                                                                                                val confirmarCancelamento = readln()
+
+                                                                                                when (confirmarCancelamento) {
+                                                                                                    "1" -> {
+                                                                                                        ingressoExpandido.statusDisponibilidade = true
+                                                                                                        println("OK: Ingresso cancelado.")
+                                                                                                        println("Estorno de R$ $valorReembolso solicitado.\n")
+                                                                                                    }
+
+                                                                                                    "2" -> println("OK: Cancelamento cancelada.")
+                                                                                                    else -> println("ERRO: Opção inválida. Solicite novamente.")
+                                                                                                }
+                                                                                            }
+                                                                                        }
                                                                                     }
-                                                                                    "0" -> println("OK: Compra cancelada.")
-                                                                                    else -> println("ERRO: Opção inválida.")
+
+                                                                                    "2" -> println("OK: Operação cancelada.\n")
+                                                                                    else -> println("ERRO: Opção inválida. Solicite novamente.\n")
                                                                                 }
                                                                             }
                                                                         }
@@ -763,11 +992,15 @@ fun main() {
                                                     }
                                                 }
                                             }
+
+                                            // Opção indisponível para organizadores
                                             TipoUsuario.ORGANIZADOR -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
 
-                                    "7" -> {
+                                    "6" -> {
+
+                                        // Para organizadores criarem eventos
                                         when (usuarioEncontrado.tipoUsuario) {
                                             TipoUsuario.ORGANIZADOR -> {
                                                 println("\nNOVO EVENTO")
@@ -832,6 +1065,7 @@ fun main() {
                                                     val minutagemFim = (horaFinal * 60) + minutoFinal
 
                                                     when {
+
                                                         // A data de fim do evento não pode ser anterior a data corrente.
                                                         dataInicio < dataHoje ->
                                                             println("ERRO: O evento não pode ser no passado.")
@@ -848,8 +1082,13 @@ fun main() {
                                                         dataFim == dataInicio && (minutagemFim - minutagemInicio) < 30 ->
                                                             println("ERRO: A duração mínima é de 30 minutos.")
 
+                                                        // Horários dentro de 24 horas e 60 minutos
+                                                        horaInicio !in 0..23 || horaFinal !in 0..23 || minutoInicio !in 0..59 || minutoFinal !in 0..59 ->
+                                                            println("ERRO: Horário inválido. Use 0-23 para horas e 0-59 para minutos.")
+
                                                         else -> {
-                                                            println("OK: Datas OK.\n")
+                                                            println("OK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio.")
+                                                            println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal.\n")
                                                             dataValida = true
                                                         }
                                                     }
@@ -918,8 +1157,9 @@ fun main() {
 
                                                             else -> {
                                                                 for (evento in listaEventos) {
-                                                                    when (evento.id) {
-                                                                        eventoPrincipal -> eventoEncontrado = true
+                                                                    when {
+                                                                        evento.id == eventoPrincipal && evento.organizadorEmail == usuarioEncontrado.email && evento.statusEvento ->
+                                                                            eventoEncontrado = true
                                                                     }
                                                                 }
                                                                 when (eventoEncontrado) {
@@ -949,15 +1189,35 @@ fun main() {
                                                     }
                                                 println("OK: MODALIDADE DEFINIDA $modalidadeEvento.\n")
 
-                                                print("Digite Capacidade Máxima de Pessoas: ")
-                                                val cadastroCapacidade = readln().toIntOrNull() ?: 0
+                                                var capacidadeValida = false
+                                                var cadastroCapacidade: Int
+                                                do {
+                                                    print("Digite Capacidade Máxima de Pessoas: ")
+                                                    cadastroCapacidade = readln().toIntOrNull() ?: 0
+
+                                                    // Valida capacidade máxima acima de 0
+                                                    when {
+                                                        cadastroCapacidade > 0 -> capacidadeValida = true
+                                                        else -> println("ERRO: Capacidade inválida. Tente novamente.\n")
+                                                    }
+                                                } while (!capacidadeValida)
                                                 println("OK: CAPACIDADE DEFINIDA $cadastroCapacidade.\n")
 
                                                 print("Digite Local do Evento (endereço ou link): ")
                                                 val cadastroLocal = readln()
 
-                                                print("Digite Preço do Ingresso: ")
-                                                val cadastroPreco = readln().toDoubleOrNull() ?: 0.0
+                                                var precoValido = false
+                                                var cadastroPreco: Double
+                                                do {
+                                                    print("Digite Preço do Ingresso: ")
+                                                    cadastroPreco = readln().toDoubleOrNull() ?: 0.0
+
+                                                    // Valida preços acima ou igual a 0
+                                                    when {
+                                                        cadastroPreco >= 0 -> precoValido = true
+                                                        else -> println("ERRO: Preço inválido. Tente novamente.\n")
+                                                    }
+                                                } while (!precoValido)
                                                 println("OK: PREÇO DEFINIDO $cadastroPreco.\n")
 
                                                 println("Aceita estorno/devolução de ingresso? [1] SIM [2] NÃO")
@@ -972,13 +1232,26 @@ fun main() {
                                                     true -> "[SIM]"
                                                     false -> "[NÃO]"
                                                 }
-
                                                 println("OK: ACEITA ESTORNO DEFINIDO $estornoTexto.\n")
-                                                val cadastroTaxa: Double
+
+                                                var cadastroTaxa: Double
                                                 when (aceitaEstorno) {
                                                     true -> {
-                                                        print("Digite Taxa de Estorno: ")
-                                                        cadastroTaxa = readln().toDoubleOrNull() ?: 0.0
+                                                        var taxaInvalida: Boolean
+                                                        do {
+                                                            print("Digite Taxa de Estorno (%): ")
+                                                            cadastroTaxa = readln().toDoubleOrNull() ?: -1.0
+
+                                                            // Valida a taxa entre 0% e 100%
+                                                            when {
+                                                                cadastroTaxa !in 0.0..100.0 -> {
+                                                                    taxaInvalida = true
+                                                                    println("ERRO: Taxa inválida. Tente novamente.\n")
+                                                                }
+
+                                                                else -> taxaInvalida = false
+                                                            }
+                                                        } while (taxaInvalida)
                                                         println("OK: TAXA DE ESTORNO DEFINIDA $cadastroTaxa.\n")
                                                     }
 
@@ -987,6 +1260,7 @@ fun main() {
                                                     }
                                                 }
 
+                                                // Cria o evento com os dados em data class Evento
                                                 val novoEvento = Evento(
                                                     id = listaEventos.size + 1,
                                                     organizadorEmail = usuarioEncontrado.email,
@@ -1009,14 +1283,14 @@ fun main() {
                                                 )
 
                                                 listaEventos.add(novoEvento)
-                                                println("SUCESSO: Evento cadastrado (ID ${novoEvento.id}).")
+                                                println("OK: Evento cadastrado (ID ${novoEvento.id}).")
                                             }
 
                                             else -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
 
-                                    "8" -> {
+                                    "7" -> {
                                         when (usuarioEncontrado.tipoUsuario) {
                                             TipoUsuario.ORGANIZADOR -> {
                                                 println("\nVISUALIZAR EVENTOS")
@@ -1032,8 +1306,8 @@ fun main() {
                                                 // Ordenação da lista por data e nome
                                                 organizadorEventos.sortWith(
                                                     compareBy(
-                                                    { it.anoInicio }, { it.mesInicio }, { it.diaInicio }, { it.horaInicio }, { it.nome }
-                                                ))
+                                                        { it.anoInicio }, { it.mesInicio }, { it.diaInicio }, { it.horaInicio }, { it.nome }
+                                                    ))
 
                                                 println("Seus eventos ativos:")
                                                 println("ID | STATUS | NOME | PERÍODO | LOCAL | PREÇO | CAPACIDADE")
@@ -1053,7 +1327,7 @@ fun main() {
                                                                         "${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} | " +
                                                                         "${evento.local} | R$ ${evento.precoIngresso} | " +
                                                                         "${evento.capacidadeMax}"
-                                                                )
+                                                            )
 
                                                             possuiEventos = true
                                                         }
@@ -1062,6 +1336,8 @@ fun main() {
 
                                                 when (possuiEventos) {
                                                     false -> println("AVISO: Nenhum evento encontrado.")
+
+                                                    // Opção para expandir um evento
                                                     true -> {
                                                         print("\nDigite ID para expandir detalhes ou [0] Voltar: ")
                                                         val opcaoID = readln().toIntOrNull() ?: 0
@@ -1119,11 +1395,12 @@ fun main() {
                                                 }
                                             }
 
+                                            // Opção indisponível para usuários comuns
                                             TipoUsuario.COMUM -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
 
-                                    "9" -> {
+                                    "8" -> {
                                         var possuiEventos = false
 
                                         // Busca todos os eventos do organizador e lista
@@ -1159,15 +1436,17 @@ fun main() {
                                                         when (eventoAlterando) {
                                                             null -> println("ERRO: Evento inválido. Tente novamente.")
                                                             else -> {
+
+                                                                // Caso o evento esteja desativado, é necessário reativar para alterar dados
                                                                 when {
                                                                     !eventoAlterando.statusEvento -> {
-                                                                        println("\nAVISO: AVISO: Este é um evento desativado. Reativar para alterar? [1] SIM [2] NÃO")
+                                                                        println("\nAVISO: Este é um evento desativado. Reativar para alterar? [1] SIM [2] NÃO")
                                                                         print("Digite opção: ")
                                                                         val reativarEvento = readln()
                                                                         when (reativarEvento) {
                                                                             "1" -> {
                                                                                 eventoAlterando.statusEvento = true
-                                                                                println("OK: Evento reativado.")
+                                                                                println("OK: Evento reativado. Solicite novamente.\n")
                                                                             }
 
                                                                             "2" -> println("OK: Operação cancelada.")
@@ -1177,6 +1456,8 @@ fun main() {
 
                                                                     else -> {
                                                                         var menuAlterarEvento = true
+
+                                                                        // Menu para alterar os dados do evento
                                                                         do {
                                                                             println("MENU: EDITANDO ${eventoAlterando.nome} (${eventoAlterando.id}).")
                                                                             println("OPÇÕES:")
@@ -1245,6 +1526,7 @@ fun main() {
                                                                                         val minutagemInicio = (horaInicio * 60) + minutoInicio
                                                                                         val minutagemFim = (horaFinal * 60) + minutoFinal
 
+                                                                                        // Validação de data igual a de cadastro de evento
                                                                                         when {
                                                                                             dataInicio < dataHoje ->
                                                                                                 println("ERRO: O evento não pode ser no passado.")
@@ -1257,6 +1539,9 @@ fun main() {
 
                                                                                             dataFim == dataInicio && (minutagemFim - minutagemInicio) < 30 ->
                                                                                                 println("ERRO: A duração mínima é de 30 minutos.")
+
+                                                                                            horaInicio !in 0..23 || horaFinal !in 0..23 || minutoInicio !in 0..59 || minutoFinal !in 0..59 ->
+                                                                                                println("ERRO: Horário inválido. Use 0-23 para horas e 0-59 para minutos.")
 
                                                                                             else -> {
                                                                                                 eventoAlterando.diaInicio = diaInicio
@@ -1344,16 +1629,23 @@ fun main() {
                                                                                                 else -> {
                                                                                                     var idValido = false
                                                                                                     for (evento in listaEventos) {
+
+                                                                                                        // Validações para vincular um evento principal
                                                                                                         when {
-                                                                                                            // ID do evento principal for igual ao digitado
+
+                                                                                                            // Se ID do evento principal for igual ao digitado...
                                                                                                             evento.id == eventoPrincipal &&
-                                                                                                                    // ID do evento principal for diferente do sub-evento
+
+                                                                                                                    // ... ID do evento principal for diferente do sub-evento...
                                                                                                                     evento.id != eventoAlterando.id &&
-                                                                                                                    // Evento pertence ao organizador
+
+                                                                                                                    // ... Evento pertence ao organizador...
                                                                                                                     evento.organizadorEmail == usuarioEncontrado.email &&
-                                                                                                                    // Evento estiver ativado
+
+                                                                                                                    // ... Evento estiver ativado...
                                                                                                                     evento.statusEvento ->
-                                                                                                                // ID do evento principal é válido
+
+                                                                                                                // Então ID do evento principal é válido
                                                                                                                 idValido = true
                                                                                                         }
                                                                                                     }
@@ -1361,7 +1653,10 @@ fun main() {
                                                                                                     when (idValido) {
                                                                                                         true -> {
                                                                                                             eventoAlterando.idEventoPrincipal = eventoPrincipal
-                                                                                                            println("OK: ID $eventoPrincipal DEFINIDO COMO EVENTO PRINCIPAL DE '${eventoAlterando.nome}'\n")
+                                                                                                            println(
+                                                                                                                "OK: ID $eventoPrincipal DEFINIDO COMO " +
+                                                                                                                        "EVENTO PRINCIPAL DE '${eventoAlterando.nome}'\n"
+                                                                                                            )
                                                                                                         }
 
                                                                                                         false -> println("ERRO: Vinculação mal-sucedida.")
@@ -1389,9 +1684,26 @@ fun main() {
                                                                                 }
 
                                                                                 "8" -> {
-                                                                                    print("Digite Capacidade atualizada: ")
-                                                                                    eventoAlterando.capacidadeMax = readln().toIntOrNull() ?: 0
-                                                                                    println("OK: CAPACIDADE DEFINIDA ${eventoAlterando.capacidadeMax}.")
+                                                                                    var ingressosVendidos = 0
+                                                                                    for (ingresso in listaIngressos) {
+                                                                                        when {
+                                                                                            ingresso.idEvento == eventoAlterando.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
+                                                                                        }
+                                                                                    }
+                                                                                    var capacidadeValida = false
+                                                                                    var alterarCapacidade: Int
+                                                                                    do {
+                                                                                        print("Digite Capacidade Máxima de Pessoas atualizada: ")
+                                                                                        alterarCapacidade = readln().toIntOrNull() ?: 0
+
+                                                                                        // A capacidade máxima de pessoas não pode ficar menor que a quantidade de ingressos vendidos
+                                                                                        when {
+                                                                                            alterarCapacidade >= ingressosVendidos && alterarCapacidade > 0 -> capacidadeValida = true
+                                                                                            else -> println("ERRO: Capacidade inválida ou menor que ingressos vendidos. Tente novamente.\n")
+                                                                                        }
+                                                                                    } while (!capacidadeValida)
+                                                                                    eventoAlterando.capacidadeMax = alterarCapacidade
+                                                                                    println("OK: CAPACIDADE DEFINIDA ${eventoAlterando.capacidadeMax}.\n")
                                                                                 }
 
                                                                                 "9" -> {
@@ -1401,9 +1713,20 @@ fun main() {
                                                                                 }
 
                                                                                 "10" -> {
-                                                                                    print("Digite Preço do Ingresso atualizado: ")
-                                                                                    eventoAlterando.precoIngresso = readln().toDoubleOrNull() ?: 0.0
-                                                                                    println("OK: PREÇO DEFINIDO ${eventoAlterando.precoIngresso}.")
+                                                                                    var precoValido = false
+                                                                                    var cadastroPreco: Double
+                                                                                    do {
+                                                                                        print("Digite Preço do Ingresso atualizado: ")
+                                                                                        cadastroPreco = readln().toDoubleOrNull() ?: 0.0
+                                                                                        when {
+                                                                                            cadastroPreco >= 0 -> precoValido = true
+                                                                                            else -> println("ERRO: Preço inválido. Tente novamente.\n")
+                                                                                        }
+                                                                                    } while (!precoValido)
+
+                                                                                    eventoAlterando.precoIngresso = cadastroPreco
+                                                                                    println("OK: PREÇO DEFINIDO ${eventoAlterando.precoIngresso}.\n")
+
                                                                                     println("ALTERANDO: Aceita estorno/devolução de ingresso? [1] SIM [2] NÃO")
                                                                                     print("Digite opção: ")
                                                                                     val alterarEstorno = readln()
@@ -1416,8 +1739,22 @@ fun main() {
                                                                                                 false -> "[NÃO]"
                                                                                             }
                                                                                             println("OK: ACEITA ESTORNO DEFINIDO $statusTexto.")
-                                                                                            print("Digite Taxa de Estorno atualizada: ")
-                                                                                            val alterarTaxa = readln().toDoubleOrNull() ?: 0.0
+
+                                                                                            var alterarTaxa: Double
+                                                                                            var taxaInvalida: Boolean
+                                                                                            do {
+                                                                                                print("Digite Taxa de Estorno (%): ")
+                                                                                                alterarTaxa = readln().toDoubleOrNull() ?: -1.0
+
+                                                                                                when {
+                                                                                                    alterarTaxa !in 0.0..100.0 -> {
+                                                                                                        taxaInvalida = true
+                                                                                                        println("ERRO: Taxa inválida. Tente novamente.\n")
+                                                                                                    }
+
+                                                                                                    else -> taxaInvalida = false
+                                                                                                }
+                                                                                            } while (taxaInvalida)
                                                                                             eventoAlterando.taxaEstorno = alterarTaxa
                                                                                             println("OK: TAXA DE ESTORNO DEFINIDA ${eventoAlterando.taxaEstorno}.\n")
                                                                                         }
@@ -1444,12 +1781,14 @@ fun main() {
                                                 }
                                             }
 
+                                            // Opção indisponível para usuários comuns
                                             TipoUsuario.COMUM -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
 
-                                    "10" -> {
+                                    "9" -> {
                                         var possuiEventos = false
+
                                         // Busca todos os eventos do organizador
                                         when (usuarioEncontrado.tipoUsuario) {
                                             TipoUsuario.ORGANIZADOR -> {
@@ -1463,6 +1802,7 @@ fun main() {
                                                         }
                                                     }
                                                 }
+
                                                 // Busca o evento selecionado
                                                 when (possuiEventos) {
                                                     false -> println("ERRO: Nenhum evento encontrado.")
@@ -1478,16 +1818,40 @@ fun main() {
                                                             }
                                                         }
                                                         when (eventoAlterando) {
-                                                            null -> println("ERRO: Evento inválido. Tente novamente.")
+                                                            null -> println("ERRO: Evento inválido. Tente novamente.\n")
                                                             else -> {
-                                                                println("Desativar o evento '${eventoAlterando.nome}'? [1] SIM [2] NÃO: ")
+                                                                println("AVISO: Caso o evento tenha vendido ingressos, os valores serão reembolsados aos compradores.")
+                                                                println("Confirma desativar o evento '${eventoAlterando.nome}'? [1] SIM, CONFIRMAR. [2] NÃO, CANCELAR.")
                                                                 print("Digite opção: ")
                                                                 val desativarEvento = readln()
 
                                                                 when (desativarEvento) {
                                                                     "1" -> {
                                                                         eventoAlterando.statusEvento = false
-                                                                        println("OK: Evento desativado (${eventoAlterando.nome}).\n")
+
+                                                                        var ingressosCancelados = 0
+                                                                        var totalReembolsado = 0.0
+
+                                                                        // Loop para desvincular todos os ingressos do evento
+                                                                        for (ingresso in listaIngressos) {
+                                                                            when {
+                                                                                ingresso.idEvento == eventoAlterando.id && !ingresso.statusDisponibilidade -> {
+                                                                                    ingresso.statusDisponibilidade = true
+                                                                                    ingressosCancelados++
+                                                                                    totalReembolsado += ingresso.valorPago
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        when {
+                                                                            ingressosCancelados > 0 -> {
+                                                                                println("OK: $ingressosCancelados ingresso(s) cancelado(s).")
+                                                                                println("OK: Total reembolsado de R$$totalReembolsado")
+                                                                                println("OK: Evento desativado (${eventoAlterando.nome}).\n")
+                                                                            }
+
+                                                                            else -> println("OK: Evento desativado (${eventoAlterando.nome}).\n")
+                                                                        }
                                                                     }
 
                                                                     "2" -> println("OK: Operação cancelada.")
@@ -1499,10 +1863,12 @@ fun main() {
                                                 }
                                             }
 
+                                            // Opção indisponível para usuários comuns
                                             TipoUsuario.COMUM -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
 
+                                    // Opção para fechar o menu principal
                                     "0" -> {
                                         println("OK: Sessão encerrada.\n")
                                         opcaoMenuLogado = "0"
@@ -1517,6 +1883,8 @@ fun main() {
             }
 
             "3" -> {
+
+                // Loop para ajustar data (validando valores inseridos)
                 do {
                     println("MENU: DEFINIR DATA DE HOJE")
                     print("Digite Somente Dia (DD): ")
@@ -1536,6 +1904,7 @@ fun main() {
                 dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
             }
 
+            // Opção para fechar o menu inicial
             "0" -> {
                 print("OK: Operação finalizada.")
             }
