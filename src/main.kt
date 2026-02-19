@@ -43,10 +43,19 @@ data class Evento(
     var taxaEstorno: Double = 0.0
 )
 
+data class Ingresso(
+    val id: Int,
+    val idEvento: Int,
+    val emailUsuario: String,
+    var statusDisponibilidade: Boolean,
+    val valorPago: Double
+)
+
 fun main() {
     // Configurando memória local
     val listaUsuarios = mutableListOf<Usuario>()
     val listaEventos = mutableListOf<Evento>()
+    val listaIngressos = mutableListOf<Ingresso>()
     var dataValida: Boolean
     var diaHoje: Int
     var mesHoje: Int
@@ -287,7 +296,7 @@ fun main() {
                                 println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
                                 when {
                                     usuarioEncontrado.tipoUsuario == TipoUsuario.COMUM -> {
-                                        println("[4] Feed de Eventos")
+                                        println("[4] Feed de Eventos [5] Comprar Ingresso")
                                     }
 
                                     usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
@@ -522,11 +531,19 @@ fun main() {
 
                                                 // Lista (temporária) de eventos disponíveis
                                                 val eventosDisponiveis = mutableListOf<Evento>()
+
                                                 for (evento in listaEventos) {
                                                     // Condensa dia/mes/ano do evento em uma data completa (como dataHoje)
                                                     val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
+
+                                                    var ingressosVendidos = 0
+                                                    for (ingresso in listaIngressos) {
+                                                        when {
+                                                            ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
+                                                        }
+                                                    }
                                                     when {
-                                                        evento.statusEvento && dataEvento >= dataHoje -> eventosDisponiveis.add(evento)
+                                                        evento.statusEvento && dataEvento >= dataHoje && ingressosVendidos < evento.capacidadeMax -> eventosDisponiveis.add(evento)
                                                     }
                                                 }
 
@@ -538,13 +555,20 @@ fun main() {
 
                                                 println("Eventos disponíveis:")
                                                 println("\nDados em ordem:")
-                                                println("ID | NOME | DATA | LOCAL | PREÇO")
+                                                println("ID | NOME | DATA | LOCAL | PREÇO | INGRESSOS")
 
                                                 var existemEventos = false
                                                 for (evento in eventosDisponiveis) {
+                                                    var ingressosVendidos = 0
+                                                    for (ingresso in listaIngressos) {
+                                                        when {
+                                                            ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
+                                                        }
+                                                    }
+                                                    val ingressosDisponiveis = evento.capacidadeMax - ingressosVendidos
                                                     println(
-                                                        "${evento.id} | ${evento.nome} | ${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} |" +
-                                                                "${evento.local} | R$ ${evento.precoIngresso}"
+                                                        "${evento.id} | ${evento.nome} | ${evento.diaInicio}/${evento.mesInicio}/${evento.anoInicio} | " +
+                                                                "${evento.local} | R$ ${evento.precoIngresso} | $ingressosDisponiveis"
                                                     )
                                                     existemEventos = true
                                                 }
@@ -569,7 +593,6 @@ fun main() {
                                                                 when (eventoDetalhes) {
                                                                     null -> println("ERRO: Nenhum evento encontrado.")
                                                                     else -> {
-                                                                        println("\n${eventoDetalhes.nome}")
                                                                         println("Nome: ${eventoDetalhes.nome}")
                                                                         println("Descrição: ${eventoDetalhes.descricao}")
                                                                         println("Página: ${eventoDetalhes.pagina}")
@@ -595,8 +618,9 @@ fun main() {
 
                                                                         when (eventoDetalhes.idEventoPrincipal) {
                                                                             null -> println("Evento Independente.")
-                                                                            else -> println("Evento Principal ID '${eventoDetalhes.idEventoPrincipal}'")
+                                                                            else -> println("Evento Principal ID ${eventoDetalhes.idEventoPrincipal}")
                                                                         }
+                                                                        println("Evento Atual ID ${eventoDetalhes.id}")
 
                                                                         print("[QUALQUER TECLA] Voltar.\n")
                                                                         readln()
@@ -607,7 +631,138 @@ fun main() {
                                                     }
                                                 }
                                             }
+                                            TipoUsuario.ORGANIZADOR -> println("ERRO: Opção inválida. Tente novamente.")
+                                        }
+                                    }
+                                    "5" -> {
+                                        when (usuarioEncontrado.tipoUsuario) {
+                                            TipoUsuario.COMUM -> {
+                                                println("\nCOMPRAR INGRESSO")
+                                                print("Digite o ID do evento que deseja comprar: ")
+                                                val idComprando = readln().toIntOrNull() ?: 0
 
+                                                var eventoComprando: Evento? = null
+                                                var ingressosRestantes: Int
+
+                                                for (evento in listaEventos) {
+                                                    when (evento.id) {
+                                                        idComprando -> {
+                                                            val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
+                                                            when {
+                                                                evento.statusEvento && dataEvento >= dataHoje -> {
+                                                                    var ingressosVendidos = 0
+                                                                    for (ingresso in listaIngressos) {
+                                                                        when {
+                                                                            ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade -> ingressosVendidos++
+                                                                        }
+                                                                    }
+                                                                    ingressosRestantes = evento.capacidadeMax - ingressosVendidos
+
+                                                                    when {
+                                                                        ingressosRestantes > 0 -> eventoComprando = evento
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                when (eventoComprando) {
+                                                    null -> println("ERRO: Evento inexistente ou indisponível.")
+                                                    else -> {
+                                                        when (eventoComprando.idEventoPrincipal) {
+                                                            null -> {
+                                                                println("Evento: ${eventoComprando.nome}")
+                                                                println("Preço Total: R$ ${eventoComprando.precoIngresso}")
+                                                                println("\n[1] Confirmar Compra  [0] Cancelar")
+                                                                print("Digite opção: ")
+                                                                val confirmar = readln()
+
+                                                                when (confirmar) {
+                                                                    "1" -> {
+                                                                        val novoIngresso = Ingresso(
+                                                                            id = listaIngressos.size + 1,
+                                                                            idEvento = eventoComprando.id,
+                                                                            emailUsuario = usuarioEncontrado.email,
+                                                                            statusDisponibilidade = false,
+                                                                            valorPago = eventoComprando.precoIngresso
+                                                                        )
+                                                                        listaIngressos.add(novoIngresso)
+                                                                        println("OK: Ingresso comprado. (ID: ${novoIngresso.id})\n")
+                                                                    }
+                                                                    "0" -> println("OK: Compra cancelada.")
+                                                                    else -> println("ERRO: Opção inválida.")
+                                                                }
+                                                            }
+                                                            else -> {
+                                                                var eventoPrincipal: Evento? = null
+                                                                for (evento in listaEventos) {
+                                                                    when (evento.id) {
+                                                                        eventoComprando.idEventoPrincipal -> eventoPrincipal = evento
+                                                                    }
+                                                                }
+
+                                                                when (eventoPrincipal) {
+                                                                    null -> println("ERRO: Evento inexistente ou indisponível.\n")
+                                                                    else -> {
+                                                                        // Verifica se o evento principal tem ingressos disponíveis
+                                                                        var vendidosPrincipal = 0
+                                                                        for (ingresso in listaIngressos) {
+                                                                            when {
+                                                                                ingresso.idEvento == eventoPrincipal.id && !ingresso.statusDisponibilidade -> vendidosPrincipal++
+                                                                            }
+                                                                        }
+                                                                        val ingressosPrincipal = eventoPrincipal.capacidadeMax - vendidosPrincipal
+
+                                                                        when {
+                                                                            ingressosPrincipal <= 0 -> println("ERRO: Evento Principal '${eventoPrincipal.nome}' indisponível.")
+                                                                            else -> {
+                                                                                val ingressosSomados = eventoComprando.precoIngresso + eventoPrincipal.precoIngresso
+                                                                                println("AVISO: Este evento exige compra dupla.")
+                                                                                println("- Sub-Evento: ${eventoComprando.nome} (R$ ${eventoComprando.precoIngresso})")
+                                                                                println("- Evento Principal:  ${eventoPrincipal.nome} (R$ ${eventoPrincipal.precoIngresso})")
+                                                                                println("VALOR TOTAL:  R$ $ingressosSomados")
+
+                                                                                println("\n[1] Confirmar Compra Dupla  [0] Cancelar")
+                                                                                print("Digite opção: ")
+                                                                                val confirmarDupla = readln()
+
+                                                                                when (confirmarDupla) {
+                                                                                    "1" -> {
+                                                                                        val ingressoSubEvento = Ingresso(
+                                                                                            id = listaIngressos.size + 1,
+                                                                                            idEvento = eventoComprando.id,
+                                                                                            emailUsuario = usuarioEncontrado.email,
+                                                                                            statusDisponibilidade = false,
+                                                                                            valorPago = eventoComprando.precoIngresso
+                                                                                        )
+                                                                                        listaIngressos.add(ingressoSubEvento)
+
+                                                                                        val ingressoEventoPrincipal = Ingresso(
+                                                                                            id = listaIngressos.size + 1,
+                                                                                            idEvento = eventoPrincipal.id,
+                                                                                            emailUsuario = usuarioEncontrado.email,
+                                                                                            statusDisponibilidade = false,
+                                                                                            valorPago = eventoPrincipal.precoIngresso
+                                                                                        )
+                                                                                        listaIngressos.add(ingressoEventoPrincipal)
+
+                                                                                        println("OK: Dois ingressos comprados.")
+                                                                                        println("1. Ingresso ID ${ingressoSubEvento.id} (${eventoComprando.nome})")
+                                                                                        println("2. Ingresso ID ${ingressoEventoPrincipal.id} (${eventoPrincipal.nome})\n")
+                                                                                    }
+                                                                                    "0" -> println("OK: Compra cancelada.")
+                                                                                    else -> println("ERRO: Opção inválida.")
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                             TipoUsuario.ORGANIZADOR -> println("ERRO: Opção inválida. Tente novamente.")
                                         }
                                     }
@@ -813,7 +968,12 @@ fun main() {
                                                         "1" -> true
                                                         else -> false
                                                     }
-                                                println("OK: ACEITA ESTORNO DEFINIDO $aceitaEstorno.\n")
+                                                val estornoTexto = when (aceitaEstorno) {
+                                                    true -> "[SIM]"
+                                                    false -> "[NÃO]"
+                                                }
+
+                                                println("OK: ACEITA ESTORNO DEFINIDO $estornoTexto.\n")
                                                 val cadastroTaxa: Double
                                                 when (aceitaEstorno) {
                                                     true -> {
