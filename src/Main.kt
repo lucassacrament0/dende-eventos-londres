@@ -9,9 +9,8 @@ fun main() {
         println("MENU INICIAL (${Repositorio.diaHoje}/${Repositorio.mesHoje}/${Repositorio.anoHoje})")
         println("1. Cadastrar Usuário")
         println("2. Acessar Usuário")
-        println("3. Ajustar Data")
         println("0. Sair")
-        val opcaoMenuInicial = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 0..3)
+        val opcaoMenuInicial = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 0..2)
 
         // Opções do menu
         when (opcaoMenuInicial) {
@@ -96,10 +95,6 @@ fun main() {
                         } while (opcaoMenuLogado != 0)
                     }
                 }
-            }
-
-            3 -> {
-                Repositorio.definirDataHoje()
             }
 
             // Opção para fechar o menu inicial

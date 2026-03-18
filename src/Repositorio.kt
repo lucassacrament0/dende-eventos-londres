@@ -1,3 +1,4 @@
+import java.time.LocalDate
 object Repositorio {
     val listaUsuarios = mutableListOf<DadosUsuario>()
     val listaEventos = mutableListOf<DadosEvento>()
@@ -8,11 +9,10 @@ object Repositorio {
     var dataHoje = 0
 
     fun definirDataHoje() {
-        println("MENU: DEFINIR DATA DE HOJE")
-        diaHoje = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
-        mesHoje = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
-        anoHoje = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 2026..Int.MAX_VALUE)
-        println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.\n")
+        val dataAutomatica = LocalDate.now()
+        diaHoje = dataAutomatica.dayOfMonth
+        mesHoje = dataAutomatica.monthValue
+        anoHoje = dataAutomatica.year
         dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
     }
 

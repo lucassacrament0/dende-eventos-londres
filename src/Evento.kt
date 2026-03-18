@@ -422,10 +422,13 @@ object Evento {
                                                                     println("OK: EVENTO PRINCIPAL DESVINCULADO.\n")
                                                                 }
 
-                                                                else -> {
-                                                                    Repositorio.vincularEventoPrincipal(idEventoPrincipal, eventoAlterando.id, usuarioEncontrado.email)
-                                                                    eventoAlterando.idEventoPrincipal = idEventoPrincipal
-                                                                    println("OK: ID $idEventoPrincipal DEFINIDO COMO EVENTO PRINCIPAL DE '${eventoAlterando.nome}'\n")
+                                                                else -> when {
+                                                                    Repositorio.vincularEventoPrincipal(idEventoPrincipal, eventoAlterando.id, usuarioEncontrado.email) -> {
+                                                                        eventoAlterando.idEventoPrincipal = idEventoPrincipal
+                                                                        println("OK: ID $idEventoPrincipal DEFINIDO COMO EVENTO PRINCIPAL DE '${eventoAlterando.nome}'\n")
+                                                                    }
+
+                                                                    else -> println("ERRO: ID $idEventoPrincipal não encontrado ou inválido.")
                                                                 }
                                                             }
                                                         }
