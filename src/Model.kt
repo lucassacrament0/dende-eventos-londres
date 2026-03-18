@@ -1,7 +1,7 @@
 enum class SexoUsuario { MASCULINO, FEMININO, NAO_INFORMADO }
 enum class TipoUsuario { COMUM, ORGANIZADOR }
 
-data class Usuario(
+data class DadosUsuario(
     var statusConta: Boolean,
     var nome: String,
     var dataNascimento: String,
@@ -21,7 +21,7 @@ enum class TipoEvento {
 }
 enum class ModalidadeEvento { PRESENCIAL, REMOTO, HIBRIDO }
 
-data class Evento(
+data class DadosEvento(
     val id: Int,
     val organizadorEmail: String,
     var pagina: String,
@@ -42,7 +42,7 @@ data class Evento(
     var taxaEstorno: Double = 0.0
 )
 
-data class Ingresso(
+data class DadosIngresso(
     val id: Int,
     val idEvento: Int,
     val emailUsuario: String,
