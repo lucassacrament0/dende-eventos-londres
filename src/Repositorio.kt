@@ -5,7 +5,7 @@ object Repositorio {
     val listaEventos = mutableListOf<DadosEvento>()
     val listaIngressos = mutableListOf<DadosIngresso>()
 
-    val dataHoje: LocalDateTime = LocalDateTime.parse("${LocalDateTime.now().year}-${LocalDateTime.now().monthValue}-${LocalDateTime.now().dayOfMonth}-${LocalDateTime.now().hour}-${LocalDateTime.now().minute}")
+    val dataHoje: LocalDateTime = LocalDateTime.now()
 
     fun verificarEmailRepetido(cadastroEmail: String): Boolean {
         return listaUsuarios.any { it.email == cadastroEmail }
@@ -68,7 +68,7 @@ object Repositorio {
             val eventoEncontrado = listaEventos.find { evento -> evento.id == ingresso.idEvento }
             val dataEvento = eventoEncontrado!!.dataInicio
             when {
-                ingresso.statusDisponibilidade || dataEvento < dataHoje -> ingressosInativos.add(ingresso)
+                ingresso.statusDisponibilidade || dataEvento.isBefore(dataHoje) -> ingressosInativos.add(ingresso)
                 else -> ingressosAtivos.add(ingresso)
             }
         }
@@ -99,7 +99,7 @@ object Repositorio {
                 ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade
             }
 
-            evento.statusEvento && dataEvento >= dataHoje && ingressosVendidos < evento.capacidadeMax
+            evento.statusEvento && (dataEvento.isAfter(dataHoje) || dataEvento.isEqual(dataHoje)) && ingressosVendidos < evento.capacidadeMax
         }
         val eventosOrdenados = eventosDisponiveis.sortedWith(
             compareBy({ evento -> evento.dataInicio }, { evento -> evento.nome })
@@ -128,7 +128,8 @@ object Repositorio {
     }
 
     fun vincularEventoPrincipal(idEventoPrincipal: Int, eventoAlterando: Int, emailOrganizador: String): Boolean {
-        return listaEventos.any { it.id == idEventoPrincipal && it.id != eventoAlterando && it.organizadorEmail == emailOrganizador && it.statusEvento
+        return listaEventos.any {
+            it.id == idEventoPrincipal && it.id != eventoAlterando && it.organizadorEmail == emailOrganizador && it.statusEvento
         }
     }
 
