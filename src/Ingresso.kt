@@ -124,7 +124,7 @@ object Ingresso {
 
         when {
             ingressoExpandido.statusDisponibilidade -> println("\nERRO: Ingresso já cancelado.")
-            dataEvento < Repositorio.dataHoje -> println("\nERRO: Evento passado. Cancelamento indisponível.")
+            dataEvento.isBefore(Repositorio.dataHoje) -> println("\nERRO: Evento passado. Cancelamento indisponível.")
             !eventoDoIngresso.statusEvento -> println("\nERRO: Evento desativado pelo organizador.")
             else -> {
                 println("\nCANCELAMENTO DE INGRESSO")

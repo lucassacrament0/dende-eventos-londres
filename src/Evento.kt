@@ -51,11 +51,7 @@ object Evento {
 
         var dataValida = false
         var dataInicio: LocalDateTime
-
         var dataFinal: LocalDateTime
-
-
-
         do {
             println("\nDEFINIR PERÍODO DO EVENTO")
 
@@ -66,7 +62,6 @@ object Evento {
             val horaInicio = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
             val minutoInicio = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
 
-
             println("MENU: DATA DE TÉRMINO")
             val diaFinal = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
             val mesFinal = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
@@ -74,10 +69,9 @@ object Evento {
             val horaFinal = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
             val minutoFinal = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
 
-
-            dataInicio = LocalDateTime.parse("$anoInicio-$mesInicio-$diaInicio-$horaInicio-$minutoInicio")
-            dataFinal = LocalDateTime.parse("$anoFinal-$mesFinal-$diaFinal-$horaFinal-$minutoFinal")
-
+            dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
+            dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
+            val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
             when {
                 dataInicio.isBefore(Repositorio.dataHoje) ->
                     println("ERRO: O evento não pode ser no passado.")
@@ -85,12 +79,12 @@ object Evento {
                 dataFinal.isBefore(dataInicio) ->
                     println("ERRO: Data de término antes da data de início.")
 
-                dataFinal.isEqual(dataInicio) && (((horaFinal - horaInicio) != 0) && (minutoFinal - minutoInicio) < 30) ->
+                duracaoMinutos < 30 ->
                     println("ERRO: A duração mínima é de 30 minutos.")
 
                 else -> {
-                    println("OK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio às $horaInicio:"+minutoInicio.toString().padStart(2, '0'))
-                    println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal às $horaFinal:"+minutoFinal.toString().padStart(2, '0'))
+                    println("OK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio às $horaInicio:" + minutoInicio.toString().padStart(2, '0'))
+                    println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal às $horaFinal:" + minutoFinal.toString().padStart(2, '0'))
                     dataValida = true
                 }
             }
@@ -317,8 +311,9 @@ object Evento {
                                                         val horaFinal = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.", 0..23)
                                                         val minutoFinal = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
 
-                                                        val dataInicio = LocalDateTime.parse("$anoInicio-$mesInicio-$diaInicio-$horaInicio-$minutoInicio")
-                                                        val dataFinal = LocalDateTime.parse("$anoFinal-$mesFinal-$diaFinal-$horaFinal-$minutoFinal")
+                                                        val dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
+                                                        val dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
+                                                        val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
                                                         when {
                                                             dataInicio.isBefore(Repositorio.dataHoje) ->
                                                                 println("ERRO: O evento não pode ser no passado.")
@@ -326,7 +321,7 @@ object Evento {
                                                             dataFinal.isBefore(dataInicio) ->
                                                                 println("ERRO: Data de término antes da data de início.")
 
-                                                            dataFinal.isEqual(dataInicio) && (((horaFinal - horaInicio) != 0) && (minutoFinal - minutoInicio) < 30) ->
+                                                            duracaoMinutos < 30 ->
                                                                 println("ERRO: A duração mínima é de 30 minutos.")
 
                                                             else -> {

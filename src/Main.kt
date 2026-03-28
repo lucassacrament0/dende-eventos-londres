@@ -1,6 +1,5 @@
 fun main() {
     println("BEM-VINDO AO DENDÊ EVENTOS")
-
     println(Repositorio.dataHoje)
 
     // Loop do menu inicial
