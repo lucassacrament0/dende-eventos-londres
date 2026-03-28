@@ -11,14 +11,8 @@ object Ingresso {
                         println("Nome: ${eventoDetalhes.nome}")
                         println("Descrição: ${eventoDetalhes.descricao}")
                         println("Página: ${eventoDetalhes.pagina}")
-                        println(
-                            "Início: ${eventoDetalhes.diaInicio}/${eventoDetalhes.mesInicio}/${eventoDetalhes.anoInicio} " +
-                                    "às ${eventoDetalhes.horaInicio}:${eventoDetalhes.minutoInicio.toString().padStart(2, '0')}"
-                        )
-                        println(
-                            "Término: ${eventoDetalhes.diaTermino}/${eventoDetalhes.mesTermino}/${eventoDetalhes.anoTermino} " +
-                                    "às ${eventoDetalhes.horaTermino}:${eventoDetalhes.minutoTermino.toString().padStart(2, '0')}"
-                        )
+                        println("Início: ${eventoDetalhes.dataInicio}")
+                        println("Término: ${eventoDetalhes.dataTermino}")
                         println("Tipo: ${eventoDetalhes.tipo}")
                         println("Modalidade: ${eventoDetalhes.modalidade}")
                         println("Local: ${eventoDetalhes.local}")
@@ -126,7 +120,7 @@ object Ingresso {
     }
 
     fun cancelarIngresso(ingressoExpandido: DadosIngresso, eventoDoIngresso: DadosEvento) {
-        val dataEvento = (eventoDoIngresso.anoInicio * 10000) + (eventoDoIngresso.mesInicio * 100) + eventoDoIngresso.diaInicio
+        val dataEvento = eventoDoIngresso.dataInicio
 
         when {
             ingressoExpandido.statusDisponibilidade -> println("\nERRO: Ingresso já cancelado.")
@@ -205,10 +199,7 @@ object Ingresso {
                                 println("\nDETALHES DO INGRESSO")
                                 println("ID: ${ingressoExpandido.id}")
                                 println("Evento: ${eventoDoIngresso.nome}")
-                                println(
-                                    "Data: ${eventoDoIngresso.diaInicio}/${eventoDoIngresso.mesInicio}/${eventoDoIngresso.anoInicio} " +
-                                            "às ${eventoDoIngresso.horaInicio}:${eventoDoIngresso.minutoInicio.toString().padStart(2, '0')}"
-                                )
+                                println("Data: ${eventoDoIngresso.dataInicio}")
                                 println("Local: ${eventoDoIngresso.local}")
                                 println("Valor Pago: R$ ${ingressoExpandido.valorPago}")
 

@@ -1,20 +1,11 @@
-import java.time.LocalDate
+import java.time.LocalDateTime
+
 object Repositorio {
     val listaUsuarios = mutableListOf<DadosUsuario>()
     val listaEventos = mutableListOf<DadosEvento>()
     val listaIngressos = mutableListOf<DadosIngresso>()
-    var diaHoje = 0
-    var mesHoje = 0
-    var anoHoje = 0
-    var dataHoje = 0
 
-    fun definirDataHoje() {
-        val dataAutomatica = LocalDate.now()
-        diaHoje = dataAutomatica.dayOfMonth
-        mesHoje = dataAutomatica.monthValue
-        anoHoje = dataAutomatica.year
-        dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
-    }
+    val dataHoje: LocalDateTime = LocalDateTime.parse("${LocalDateTime.now().year}-${LocalDateTime.now().monthValue}-${LocalDateTime.now().dayOfMonth}-${LocalDateTime.now().hour}-${LocalDateTime.now().minute}")
 
     fun verificarEmailRepetido(cadastroEmail: String): Boolean {
         return listaUsuarios.any { it.email == cadastroEmail }
@@ -75,16 +66,14 @@ object Repositorio {
         val ingressosInativos = mutableListOf<DadosIngresso>()
         ingressosUsuario.forEach { ingresso ->
             val eventoEncontrado = listaEventos.find { evento -> evento.id == ingresso.idEvento }
-            val dataEvento = (eventoEncontrado!!.anoInicio * 10000) + (eventoEncontrado.mesInicio * 100) + eventoEncontrado.diaInicio
+            val dataEvento = eventoEncontrado!!.dataInicio
             when {
                 ingresso.statusDisponibilidade || dataEvento < dataHoje -> ingressosInativos.add(ingresso)
                 else -> ingressosAtivos.add(ingresso)
             }
         }
         val ordenarIngressos = compareBy<DadosIngresso>(
-            { ingresso -> listaEventos.find { evento -> evento.id == ingresso.idEvento }?.anoInicio },
-            { ingresso -> listaEventos.find { evento -> evento.id == ingresso.idEvento }?.mesInicio },
-            { ingresso -> listaEventos.find { evento -> evento.id == ingresso.idEvento }?.diaInicio },
+            { ingresso -> listaEventos.find { evento -> evento.id == ingresso.idEvento }?.dataInicio },
             { ingresso -> listaEventos.find { evento -> evento.id == ingresso.idEvento }?.nome }
         )
         val ingressosOrdenados = ingressosAtivos.sortedWith(ordenarIngressos) + ingressosInativos.sortedWith(ordenarIngressos)
@@ -103,9 +92,9 @@ object Repositorio {
         listaEventos.add(evento)
     }
 
-    fun eventosDisponiveisOrdenados(dataHoje: Int): List<DadosEvento> {
+    fun eventosDisponiveisOrdenados(dataHoje: LocalDateTime): List<DadosEvento> {
         val eventosDisponiveis = listaEventos.filter { evento ->
-            val dataEvento = (evento.anoInicio * 10000) + (evento.mesInicio * 100) + evento.diaInicio
+            val dataEvento = evento.dataInicio
             val ingressosVendidos = listaIngressos.count { ingresso ->
                 ingresso.idEvento == evento.id && !ingresso.statusDisponibilidade
             }
@@ -113,7 +102,7 @@ object Repositorio {
             evento.statusEvento && dataEvento >= dataHoje && ingressosVendidos < evento.capacidadeMax
         }
         val eventosOrdenados = eventosDisponiveis.sortedWith(
-            compareBy({ evento -> evento.anoInicio }, { evento -> evento.mesInicio }, { evento -> evento.diaInicio }, { evento -> evento.nome })
+            compareBy({ evento -> evento.dataInicio }, { evento -> evento.nome })
         )
         return eventosOrdenados
     }
@@ -146,7 +135,7 @@ object Repositorio {
     fun eventosOrganizadorOrdenados(emailOrganizador: String): List<DadosEvento> {
         val eventosOrganizador = buscarEventosOrganizador(emailOrganizador)
         val eventosOrdenados = eventosOrganizador.sortedWith(
-            compareBy({ evento -> evento.anoInicio }, { evento -> evento.mesInicio }, { evento -> evento.diaInicio }, { evento -> evento.nome })
+            compareBy({ evento -> evento.dataInicio }, { evento -> evento.nome })
         )
         return eventosOrdenados
     }

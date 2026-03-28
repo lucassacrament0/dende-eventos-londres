@@ -1,3 +1,5 @@
+import java.time.LocalDateTime
+
 enum class SexoUsuario { MASCULINO, FEMININO, NAO_INFORMADO }
 enum class TipoUsuario { COMUM, ORGANIZADOR }
 
@@ -27,10 +29,8 @@ data class DadosEvento(
     var pagina: String,
     var nome: String,
     var descricao: String,
-    var diaInicio: Int, var mesInicio: Int, var anoInicio: Int,
-    var horaInicio: Int, var minutoInicio: Int,
-    var diaTermino: Int, var mesTermino: Int, var anoTermino: Int,
-    var horaTermino: Int, var minutoTermino: Int,
+    var dataInicio: LocalDateTime,
+    var dataTermino: LocalDateTime,
     var tipo: TipoEvento,
     var idEventoPrincipal: Int?,
     var modalidade: ModalidadeEvento,

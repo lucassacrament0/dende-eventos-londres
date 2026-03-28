@@ -1,3 +1,5 @@
+import java.time.LocalDateTime
+
 object Evento {
     fun feedEventos(usuarioEncontrado: DadosUsuario) {
         when (usuarioEncontrado.tipoUsuario) {
@@ -17,7 +19,7 @@ object Evento {
                             listOf(
                                 evento.id.toString(),
                                 evento.nome,
-                                "${evento.diaInicio.toString().padStart(2, '0')}/${evento.mesInicio.toString().padStart(2, '0')}/${evento.anoInicio}",
+                                "${evento.dataInicio}",
                                 evento.local,
                                 "R$${evento.precoIngresso}",
                                 vagasRestantes.toString()
@@ -48,51 +50,42 @@ object Evento {
         val cadastroDescricao = readString("Digite Descrição do Evento: ", "ERRO: Descrição inválida. Tente novamente.")
 
         var dataValida = false
-        var diaInicio: Int?
-        var mesInicio: Int?
-        var anoInicio: Int?
-        var horaInicio: Int?
-        var minutoInicio: Int?
+        var dataInicio: LocalDateTime
 
-        var diaFinal: Int?
-        var mesFinal: Int?
-        var anoFinal: Int?
-        var horaFinal: Int?
-        var minutoFinal: Int?
+        var dataFinal: LocalDateTime
+
+
 
         do {
             println("\nDEFINIR PERÍODO DO EVENTO")
 
             println("MENU: DATA DE INÍCIO")
-            diaInicio = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
-            mesInicio = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
-            anoInicio = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 2026..2100)
-            horaInicio = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
-            minutoInicio = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
+            val diaInicio = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
+            val mesInicio = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
+            val anoInicio = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 2026..2100)
+            val horaInicio = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
+            val minutoInicio = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
+
 
             println("MENU: DATA DE TÉRMINO")
-            diaFinal = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
-            mesFinal = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
-            anoFinal = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 2026..2100)
-            horaFinal = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
-            minutoFinal = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
+            val diaFinal = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
+            val mesFinal = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
+            val anoFinal = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 2026..2100)
+            val horaFinal = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.", 0..23)
+            val minutoFinal = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
 
-            val dataInicio = (anoInicio * 10000) + (mesInicio * 100) + diaInicio
-            val dataFim = (anoFinal * 10000) + (mesFinal * 100) + diaFinal
-            val minutagemInicio = (horaInicio * 60) + minutoInicio
-            val minutagemFim = (horaFinal * 60) + minutoFinal
+
+            dataInicio = LocalDateTime.parse("$anoInicio-$mesInicio-$diaInicio-$horaInicio-$minutoInicio")
+            dataFinal = LocalDateTime.parse("$anoFinal-$mesFinal-$diaFinal-$horaFinal-$minutoFinal")
 
             when {
-                dataInicio < Repositorio.dataHoje ->
+                dataInicio.isBefore(Repositorio.dataHoje) ->
                     println("ERRO: O evento não pode ser no passado.")
 
-                dataFim < dataInicio ->
+                dataFinal.isBefore(dataInicio) ->
                     println("ERRO: Data de término antes da data de início.")
 
-                dataFim == dataInicio && minutagemFim < minutagemInicio ->
-                    println("ERRO: Hora de término antes da hora de início.")
-
-                dataFim == dataInicio && (minutagemFim - minutagemInicio) < 30 ->
+                dataFinal.isEqual(dataInicio) && (((horaFinal - horaInicio) != 0) && (minutoFinal - minutoInicio) < 30) ->
                     println("ERRO: A duração mínima é de 30 minutos.")
 
                 else -> {
@@ -220,10 +213,8 @@ object Evento {
             nome = cadastroNome,
             pagina = cadastroPagina,
             descricao = cadastroDescricao,
-            diaInicio = diaInicio, mesInicio = mesInicio, anoInicio = anoInicio,
-            horaInicio = horaInicio, minutoInicio = minutoInicio,
-            diaTermino = diaFinal, mesTermino = mesFinal, anoTermino = anoFinal,
-            horaTermino = horaFinal, minutoTermino = minutoFinal,
+            dataInicio = dataInicio,
+            dataTermino = dataFinal,
             tipo = tipoEvento,
             idEventoPrincipal = idEventoPrincipal,
             modalidade = modalidadeEvento,
@@ -326,34 +317,21 @@ object Evento {
                                                         val horaFinal = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.", 0..23)
                                                         val minutoFinal = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.", 0..59)
 
-                                                        val dataInicio = (anoInicio * 10000) + (mesInicio * 100) + diaInicio
-                                                        val dataFim = (anoFinal * 10000) + (mesFinal * 100) + diaFinal
-                                                        val minutagemInicio = (horaInicio * 60) + minutoInicio
-                                                        val minutagemFim = (horaFinal * 60) + minutoFinal
+                                                        val dataInicio = LocalDateTime.parse("$anoInicio-$mesInicio-$diaInicio-$horaInicio-$minutoInicio")
+                                                        val dataFinal = LocalDateTime.parse("$anoFinal-$mesFinal-$diaFinal-$horaFinal-$minutoFinal")
                                                         when {
-                                                            dataInicio < Repositorio.dataHoje ->
+                                                            dataInicio.isBefore(Repositorio.dataHoje) ->
                                                                 println("ERRO: O evento não pode ser no passado.")
 
-                                                            dataFim < dataInicio ->
+                                                            dataFinal.isBefore(dataInicio) ->
                                                                 println("ERRO: Data de término antes da data de início.")
 
-                                                            dataFim == dataInicio && minutagemFim < minutagemInicio ->
-                                                                println("ERRO: Hora de término antes da hora de início.")
-
-                                                            dataFim == dataInicio && (minutagemFim - minutagemInicio) < 30 ->
+                                                            dataFinal.isEqual(dataInicio) && (((horaFinal - horaInicio) != 0) && (minutoFinal - minutoInicio) < 30) ->
                                                                 println("ERRO: A duração mínima é de 30 minutos.")
 
                                                             else -> {
-                                                                eventoAlterando.diaInicio = diaInicio
-                                                                eventoAlterando.mesInicio = mesInicio
-                                                                eventoAlterando.anoInicio = anoInicio
-                                                                eventoAlterando.horaInicio = horaInicio
-                                                                eventoAlterando.minutoInicio = minutoInicio
-                                                                eventoAlterando.diaTermino = diaFinal
-                                                                eventoAlterando.mesTermino = mesFinal
-                                                                eventoAlterando.anoTermino = anoFinal
-                                                                eventoAlterando.horaTermino = horaFinal
-                                                                eventoAlterando.minutoTermino = minutoFinal
+                                                                eventoAlterando.dataInicio = dataInicio
+                                                                eventoAlterando.dataTermino = dataFinal
                                                                 println("\nOK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio.")
                                                                 println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal.")
                                                                 dataValida = true
@@ -532,7 +510,7 @@ object Evento {
                         evento.id.toString(),
                         statusTexto,
                         evento.nome,
-                        "${evento.diaInicio.toString().padStart(2, '0')}/${evento.mesInicio.toString().padStart(2, '0')}",
+                        "${evento.dataInicio}",
                         evento.local,
                         "R$${evento.precoIngresso}",
                         "$ingressosVendidos / ${evento.capacidadeMax}"
@@ -554,14 +532,8 @@ object Evento {
                                 println("Nome: ${eventoDetalhes.nome}")
                                 println("Descrição: ${eventoDetalhes.descricao}")
                                 println("Página: ${eventoDetalhes.pagina}")
-                                println(
-                                    "Início: ${eventoDetalhes.diaInicio}/${eventoDetalhes.mesInicio}/${eventoDetalhes.anoInicio} " +
-                                            "às ${eventoDetalhes.horaInicio}:${eventoDetalhes.minutoInicio.toString().padStart(2, '0')}"
-                                )
-                                println(
-                                    "Término: ${eventoDetalhes.diaTermino}/${eventoDetalhes.mesTermino}/${eventoDetalhes.anoTermino} " +
-                                            "às ${eventoDetalhes.horaTermino}:${eventoDetalhes.minutoTermino.toString().padStart(2, '0')}"
-                                )
+                                println("Início: ${eventoDetalhes.dataInicio}")
+                                println("Término: ${eventoDetalhes.dataTermino}")
                                 println("Tipo: ${eventoDetalhes.tipo}")
                                 println("Modalidade: ${eventoDetalhes.modalidade}")
                                 println("Local: ${eventoDetalhes.local}")

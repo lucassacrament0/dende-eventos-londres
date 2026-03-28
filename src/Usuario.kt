@@ -1,3 +1,5 @@
+import java.time.LocalDateTime
+
 object Usuario {
     fun validarEmailCadastro(emailInserido: String, emailConfirmado: String): Boolean {
         var emailValido = false
@@ -254,9 +256,9 @@ object Usuario {
             }
         }
 
-        var idadeDia = Repositorio.diaHoje - diaInt
-        var idadeMes = Repositorio.mesHoje - mesInt
-        var idadeAno = Repositorio.anoHoje - anoInt
+        var idadeDia = LocalDateTime.now().dayOfMonth - diaInt
+        var idadeMes = LocalDateTime.now().monthValue - mesInt
+        var idadeAno = LocalDateTime.now().year - anoInt
         when {
             idadeDia < 0 -> {
                 idadeMes -= 1

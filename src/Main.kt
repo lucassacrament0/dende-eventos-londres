@@ -1,12 +1,11 @@
 fun main() {
     println("BEM-VINDO AO DENDÊ EVENTOS")
 
-    // Definir data (válida)
-    Repositorio.definirDataHoje()
+    println(Repositorio.dataHoje)
 
     // Loop do menu inicial
     do {
-        println("MENU INICIAL (${Repositorio.diaHoje}/${Repositorio.mesHoje}/${Repositorio.anoHoje})")
+        println("MENU INICIAL")
         println("1. Cadastrar Usuário")
         println("2. Acessar Usuário")
         println("0. Sair")
@@ -24,7 +23,7 @@ fun main() {
                     usuarioEncontrado != null && usuarioEncontrado.statusConta -> {
                         println("OK: Acesso bem-sucedido.\n")
                         do {
-                            println("MENU PRINCIPAL - ÁREA LOGADA (${Repositorio.diaHoje}/${Repositorio.mesHoje}/${Repositorio.anoHoje})")
+                            println("MENU PRINCIPAL - ÁREA LOGADA")
                             println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                             println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
 
