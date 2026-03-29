@@ -405,6 +405,20 @@ fun main() {
                             do {
                                 // o ideal aqui nesse momento é que vocês fizessem um if que separasse tudo que é de
                                 // origanizador fica de um lado e tudo que é de usuário comum fica no outro.
+
+                                /*
+                                    when(usuarioEncontrado.tipoUsuario) {
+                                        TipoUsuario.COMUM -> {
+                                            TODO O MENU E TUDO DE USUÁRIO COMUM
+                                        }
+
+                                        TipoUsuario.ORGANIZADOR -> {
+                                            TODO O MENU E TUDO DE ORGANIZADOR
+                                        }
+                                    }
+                                 */
+
+
                                 println("MENU PRINCIPAL - ÁREA LOGADA ($diaHoje/$mesHoje/$anoHoje)")
                                 println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                                 println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
