@@ -1,5 +1,7 @@
 enum class SexoUsuario { MASCULINO, FEMININO, NAO_INFORMADO }
-enum class TipoUsuario { COMUM, ORGANIZADOR }
+enum class TipoUsuario { COMUM, ORGANIZADOR } // boa, gosto dessa solução
+// acho que facilita um pouco as abstrações e a manutenção do código, além de deixar
+// o menu mais dinâmico (exibir opções específicas para cada tipo de usuário)
 
 data class Usuario(
     var statusConta: Boolean,
@@ -9,6 +11,8 @@ data class Usuario(
     val email: String,
     var senha: String,
     val tipoUsuario: TipoUsuario,
+    // eu acho que aqui vocês poderia ter criado um data class Empresa para organizar melhor os dados relacionados à empresa,
+    // e o Usuario teria uma variável do tipo Empresa? (nula para usuários comuns)
     var cnpj: String? = null,
     var razaoSocial: String? = null,
     var nomeFantasia: String? = null
@@ -24,16 +28,20 @@ enum class ModalidadeEvento { PRESENCIAL, REMOTO, HIBRIDO }
 
 data class Evento(
     val id: Int,
-    val organizadorEmail: String,
+    val organizadorEmail: String, // aqui deveria ser do tipo Usuario
+    // val organizador: Usuario
     var pagina: String,
     var nome: String,
     var descricao: String,
-    var diaInicio: Int, var mesInicio: Int, var anoInicio: Int,
+    var diaInicio: Int, var mesInicio: Int, var anoInicio: Int, // acho que vocês complicaram aqui, poderia ter usado o
+    // LocalDateTime do Kotlin para representar a data completa (dia, mês e ano) em uma única variável, ao invés de 3 variáveis separadas para dia, mês e ano
     var horaInicio: Int, var minutoInicio: Int,
+    // mesma coisa aqui deveria ser um LocalDateTime para representar a data e hora de término do evento
     var diaTermino: Int, var mesTermino: Int, var anoTermino: Int,
     var horaTermino: Int, var minutoTermino: Int,
     var tipo: TipoEvento,
-    var idEventoPrincipal: Int?,
+    var idEventoPrincipal: Int?, // aqui deveria ser um evento do tipo Evento? para representar a relação de subevento
+    // com evento principal, ao invés de usar um id (inteiro) para fazer essa associação
     var modalidade: ModalidadeEvento,
     var capacidadeMax: Int,
     var local: String,
@@ -45,8 +53,8 @@ data class Evento(
 
 data class Ingresso(
     val id: Int,
-    val idEvento: Int,
-    val emailUsuario: String,
+    val idEvento: Int, // aqui deveria ser Evento ao invés de um id (inteiro) para representar a associação do ingresso com o evento
+    val emailUsuario: String, // aqui deveria ser o Usuario ao invés de um email (String) para representar a associação do ingresso com o usuário
     var statusDisponibilidade: Boolean,
     val valorPago: Double
 )
@@ -57,6 +65,9 @@ fun main() {
     val listaUsuarios = mutableListOf<Usuario>()
     val listaEventos = mutableListOf<Evento>()
     val listaIngressos = mutableListOf<Ingresso>()
+
+    // aqui é um problema que vocês vão enfrentar ao usar variáveis separadas para dia, mês e ano, que é a dificuldade de comparar datas
+    // (por exemplo, para validar se um evento é futuro ou passado, ou para calcular a idade do usuário com base na data de nascimento)
     var dataValida: Boolean
     var diaHoje: Int
     var mesHoje: Int
@@ -68,6 +79,8 @@ fun main() {
     // Loop de definir e validar data
     do {
         println("MENU: DEFINIR DATA DE HOJE")
+        // vocês deveria ter usado o LocalDateTime do Kotlin para representar a data de hoje, e aí poderiam
+        // val dataHoje = LocalDateTime.now() para obter a data atual do sistema
         print("Digite Somente Dia (DD): ")
         diaHoje = readln().toIntOrNull() ?: 0
         print("Digite Somente Mês (MM): ")
@@ -76,13 +89,16 @@ fun main() {
         anoHoje = readln().toIntOrNull() ?: 0
 
         dataValida = false
+        // aumento de código desncessário para validar a data, que poderia ser facilmente resolvido usando o LocalDateTime do Kotlin
         when {
             diaHoje in 1..31 && mesHoje in 1..12 && anoHoje >= 2026 -> dataValida = true
             else -> println("ERRO: Data inválida. Tente novamente.")
         }
-    } while (!dataValida)
+    } while (!dataValida) // mas foi um uso interessante do do-while para validar a data, parabéns pela criatividade! :)
+    // mas a condição deveria ser: diaHoje !in 1..31 || mesHoje !in 1..12 || anoHoje < 2026
+
     println("OK: DATA DEFINIDA $diaHoje/$mesHoje/$anoHoje.\n")
-    dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje
+    dataHoje = (anoHoje * 10000) + (mesHoje * 100) + diaHoje // meu Deus convertendo em timestamp?
 
     // Loop do menu inicial
     do {
@@ -108,6 +124,17 @@ fun main() {
                     var emailInvalido = false
 
                     // Loop para inserir e-mail (validar em duas etapas)
+
+                    // isso aqui poderia ser simplificado para:
+
+                    /**
+                     * do {
+                     *      val emailRepetido = listaUsuarios.any { it.email == cadastroEmail }
+                     * } while (cadastroEmail != confirmarEmail || cadastroEmail.length < 5 ||
+                     *  !cadastroEmail.contains("@") || !cadastroEmail.contains(".") || emailRepetido)
+                     *
+                     */
+
                     do {
                         var emailConfirmado = false
                         print("Digite E-mail: ")
@@ -132,6 +159,10 @@ fun main() {
                         cadastroEmail.contains("@") && cadastroEmail.contains(".") -> emailInvalido = false
                     }
 
+                    // isso aqui pode ser substituido pelo any do Kotlin, que verifica se algum elemento da
+                    // lista atende a condição (no caso, se o email do usuário é igual ao email cadastrado):
+                    // listaUsuarios.any { it.email == cadastroEmail }
+
                     // Verifica se o e-mail já existe
                     for (usuario in listaUsuarios) {
                         when {
@@ -149,7 +180,24 @@ fun main() {
 
                 // Variável e loop para cadastro e validação de data de nascimento
                 var cadastroNascimento = "0"
+                // nossa que complicação, vocês poderiam ter usado o LocalDateTime do Kotlin para representar a data de nascimento,
+                // e aí poderiam validar a data de nascimento comparando com a data de hoje (dataHoje) para garantir que o usuário
+                // tem pelo menos 18 anos, por exemplo
+                // a leitura da data de nascimento, validando se ela de fato é uma data válida e
+                // a pessoa tem mais de 18 anos poderia ser feita da seguinte forma:
 
+                /***
+                 * var dataNascimento? = null
+                 * do {
+                 *      if (dataNascimento != null) {
+                 *      println("ERRO: Data de nascimento inválida. Tente novamente.\n")
+                 *      }
+                 *     print("Digite Data de Nascimento (DD/MM/AAAA): ")
+                 *     dataNascimento = readln().takeIf { it.matches(Regex("\\d{2}/\\d{2}/\\d{4}")) }?.let {
+                 *          LocalDateTime.parse(it, DateTimeFormatter.ofPattern("dd/MM/yyyy")) } ?: "INVALIDA"
+                 *          // valida o formato da data
+                 * } while (dataNascimento == "INVALIDA" || dataNascimento.isBefore(LocalDateTime.now().minusYears(18) ))
+                 *     */
                 do {
                     println("\nMENU: DEFINIR DATA DE NASCIMENTO")
                     print("Digite Somente Dia de Nascimento (DD): ")
@@ -173,12 +221,30 @@ fun main() {
 
                 // Variável e loop para inserir senha (validar com duas etapas)
                 var cadastroSenha: String
+                var confirmarSenha: String
 
+                // do while com takeif poderia ser uma solução mais elegante para validar a senha, por exemplo:
+                /**
+                 * do {
+                 *    when {
+                   *         cadastroSenha == "INVALIDA" -> println("ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n")
+                   *         cadastroSenha != confirmarSenha -> println("ERRO: Senhas não conferem. Tente novamente.\n")
+                   *         else -> println("OK: SENHA DEFINIDA.\n")
+                   *  }
+                 *    print("Digite Nova Senha: ")
+                 *    cadastroSenha = readln().takeIf { it.isNotBlank() && it.length >= 8 } ?: "INVALIDA"
+                 *    print("Confirme Nova Senha: ")
+                 *    confirmarSenha = readln()
+                 *  } while (cadastroSenha == "INVALIDA" || cadastroSenha != confirmarSenha)
+                 */
                 do {
                     print("Digite Nova Senha: ")
+                    // achava legal você usar o takeIf nesse caso:
+                    // cadastroSenha = readln().takeIf { it.isNotBlank() && it.length >= 8 } ?: "INVALIDA"
                     cadastroSenha = readln()
                     print("Confirme Nova Senha: ")
                     val confirmarSenha = readln()
+
                     when {
                         cadastroSenha.length < 8 -> println("ERRO: A senha deve ter no mínimo 8 caracteres.\n")
                         cadastroSenha != confirmarSenha -> println("ERRO: Senhas não conferem. Tente novamente.\n")
@@ -228,19 +294,36 @@ fun main() {
                             "1" -> {
                                 println("\nCADASTRO DE EMPRESA")
 
+                                // eu acho que a validação do CNPJ poderia ser feita usando o takeIf do Kotlin, por exemplo:
+                                /***
+                                    do {
+                                        if (cadastroCNPJ == "INVALIDO") {
+                                            println("ERRO: CNPJ inválido. Tente novamente.\n")
+                                        }
+                                        print("Digite CNPJ (14 dígitos): ")
+                                        cadastroCNPJ = readln().takeIf { it.matches(Regex("\\d{14}")) } ?: "INVALIDO"
+                                    } while (cadastroCNPJ == "INVALIDO")
+                                 */
                                 // Variável e loop para validar o CNPJ
                                 var cnpjValido = false
                                 do {
                                     print("Digite CNPJ (14 dígitos): ")
+                                    //vocês poderia usar o takeIf aqui também para validar o CNPJ, por exemplo:
+                                    // cadastroCNPJ = readln().takeIf { it.matches(Regex("\\d{14}")) } ?: "INVALIDO"
                                     cadastroCNPJ = readln()
-
                                     when {
                                         cadastroCNPJ.length == 14 -> cnpjValido = true
                                         else -> println("ERRO: CNPJ inválido. Tente novamente.\n")
                                     }
                                 } while (!cnpjValido)
+
                                 println("OK: CNPJ DEFINIDO '$cadastroCNPJ'.\n")
 
+                                //eu acho legal o uso do takeIf para validar as entradas de razão social e nome fantasia, por exemplo:
+                                /**
+                                 * print("Digite Razão Social: ")
+                                 * cadastroRazao = readln().takeIf { it.isNotBlank() }?.uppercase() ?: "RAZÃO SOCIAL INVÁLIDA"
+                                 */
                                 print("Digite Razão Social: ")
                                 cadastroRazao = readln().uppercase()
 
@@ -282,11 +365,20 @@ fun main() {
                 val buscarSenha = readln()
 
                 // Busca na lista de usuários
+                // isso aqui poderia ser simplificado usando o find do Kotlin, por exemplo:
+                // val usuarioEncontrado = listaUsuarios.find { it.email == buscarEmail && it.senha == buscarSenha }
+
                 for (usuario in listaUsuarios) {
                     when {
                         usuario.email == buscarEmail && usuario.senha == buscarSenha -> usuarioEncontrado = usuario
                     }
                 }
+
+                // vocês poderiam fazer isso aqui usando o when para verificar se o usuário foi encontrado, se
+                // a conta está ativa ou desativada, e aí exibir as mensagens correspondentes, por exemplo:
+                /*if(!usuarioEncontrado?.statusConta!!) {
+                    println("\nAVISO: Esta é uma conta desativada. Reativar para acessar? [1] SIM [2] NÃO")
+                }*/
 
                 // Se o usuário não foi localizado, mostra mensagem de erro
                 when {
@@ -311,6 +403,8 @@ fun main() {
                         usuarioEncontrado.statusConta -> {
                             println("OK: Acesso bem-sucedido.\n")
                             do {
+                                // o ideal aqui nesse momento é que vocês fizessem um if que separasse tudo que é de
+                                // origanizador fica de um lado e tudo que é de usuário comum fica no outro.
                                 println("MENU PRINCIPAL - ÁREA LOGADA ($diaHoje/$mesHoje/$anoHoje)")
                                 println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                                 println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
