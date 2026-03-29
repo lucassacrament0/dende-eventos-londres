@@ -25,30 +25,30 @@ object Usuario {
     fun cadastrarUsuario() {
         println("\nCADASTRAR USUÁRIO")
 
-        val cadastroEmail = readString("Digite E-mail: ", "ERRO: E-mail inválido. Tente novamente.", 3).lowercase()
-        val confirmarEmail = readString("Confirme E-mail: ", "ERRO: E-mail inválido. Tente novamente.", 3).lowercase()
+        val cadastroEmail = readString("Digite E-mail: ", "ERRO: E-mail inválido. Tente novamente.\n", 3).lowercase()
+        val confirmarEmail = readString("Confirme E-mail: ", "ERRO: E-mail inválido. Tente novamente.\n", 3).lowercase()
         when {
             validarEmailCadastro(cadastroEmail, confirmarEmail) -> {
                 println("OK: E-MAIL DEFINIDO '$cadastroEmail'.\n")
 
-                val cadastroNome = readString("Digite Nome: ", "ERRO: Nome inválido. Tente novamente.", 2).uppercase()
+                val cadastroNome = readString("Digite Nome: ", "ERRO: Nome inválido. Tente novamente.\n", 2).uppercase()
                 println("OK: NOME DEFINIDO '$cadastroNome'.\n")
 
                 println("MENU: DEFINIR DATA DE NASCIMENTO")
-                val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD): ", "ERRO: Dia inválido. Tente novamente.", 1..31)
-                val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM): ", "ERRO: Mês inválido. Tente novamente.", 1..12)
-                val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA): ", "ERRO: Ano inválido. Tente novamente.", 1920..2020)
+                val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2020)
                 val cadastroNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
                 println("OK: DATA DE NASCIMENTO DEFINIDA $cadastroNascimento.\n")
 
-                val cadastroSenha = readString("Digite Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente. ", 8)
-                val confirmarSenha = readString("Confirme Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente. ", 8)
+                val cadastroSenha = readString("Digite Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
+                val confirmarSenha = readString("Confirme Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
                 when {
                     validarSenhaCadastro(cadastroSenha, confirmarSenha) -> {
                         println("OK: SENHA DEFINIDA.\n")
 
                         println("Sexo: [1] MASCULINO, [2] FEMININO, [3] PREFIRO NÃO INFORMAR")
-                        val opcaoSexo = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..3)
+                        val opcaoSexo = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..3)
 
                         val cadastroSexo = when (opcaoSexo) {
                             1 -> SexoUsuario.MASCULINO
@@ -58,7 +58,7 @@ object Usuario {
                         println("OK: SEXO DEFINIDO $cadastroSexo.\n")
 
                         println("Você é organizador de eventos? [1] SIM, [2] NÃO")
-                        val tipoUsuario = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..2)
+                        val tipoUsuario = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..2)
 
                         val cadastroOrganizador = when (tipoUsuario) {
                             1 -> TipoUsuario.ORGANIZADOR
@@ -74,19 +74,19 @@ object Usuario {
                         when (tipoUsuario) {
                             1 -> {
                                 println("Você possui uma empresa? [1] SIM [2] NÃO")
-                                cadastroEmpresa = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..2)
+                                cadastroEmpresa = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..2)
 
                                 when (cadastroEmpresa) {
                                     1 -> {
                                         println("\nCADASTRO DE EMPRESA")
 
-                                        cadastroCNPJ = readString("Digite CNPJ (14 dígitos): ", "ERRO: CNPJ inválido. Tente novamente.", 14)
+                                        cadastroCNPJ = readString("Digite CNPJ (14 dígitos): ", "ERRO: CNPJ inválido. Tente novamente.\n", 14)
                                         println("OK: CNPJ DEFINIDO '$cadastroCNPJ'.\n")
 
-                                        cadastroRazaoSocial = readString("Digite Razão Social: ", "ERRO: Razão Social inválida. Tente novamente.", 2).uppercase()
+                                        cadastroRazaoSocial = readString("Digite Razão Social: ", "ERRO: Razão Social inválida. Tente novamente.\n", 2).uppercase()
                                         println("OK: RAZÃO SOCIAL DEFINIDA '$cadastroRazaoSocial'.\n")
 
-                                        cadastroNomeFantasia = readString("Digite Nome Fantasia: ", "ERRO: Nome Fantasia inválido. Tente novamente.", 2).uppercase()
+                                        cadastroNomeFantasia = readString("Digite Nome Fantasia: ", "ERRO: Nome Fantasia inválido. Tente novamente.\n", 2).uppercase()
                                         println("OK: NOME FANTASIA DEFINIDO '$cadastroNomeFantasia'.\n")
                                     }
 
@@ -120,22 +120,22 @@ object Usuario {
 
     fun acessarUsuario(): DadosUsuario? {
         println("\nACESSAR USUÁRIO")
-        val buscarEmail = readString("Digite o e-mail da sua conta: ", "ERRO: E-mail inválido. Tente novamente.", 3).lowercase()
-        val buscarSenha = readString("Digite a senha da sua conta: ", "ERRO: Senha inválida. Tente novamente.", 8)
+        val buscarEmail = readString("Digite o e-mail da sua conta: ", "ERRO: E-mail inválido. Tente novamente.\n", 3).lowercase()
+        val buscarSenha = readString("Digite a senha da sua conta: ", "ERRO: Senha inválida. Tente novamente.\n", 8)
         val usuarioEncontrado = Repositorio.buscarUsuarioCadastrado(buscarEmail, buscarSenha)
         when {
             usuarioEncontrado == null -> println("ERRO: E-mail e/ou senha incorretos. Solicite novamente.\n")
             else -> when {
                 !usuarioEncontrado.statusConta -> {
                     println("\nAVISO: Esta é uma conta desativada. Reativar para acessar? [1] SIM [2] NÃO")
-                    val reativarConta = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..2)
+                    val reativarConta = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..2)
                     when (reativarConta) {
                         1 -> {
                             usuarioEncontrado.statusConta = true
-                            println("OK: Conta reativada. Acesse novamente.")
+                            println("OK: Conta reativada. Acesse novamente.\n")
                         }
 
-                        else -> println("OK: Operação cancelada.")
+                        else -> println("OK: Operação cancelada.\n")
                     }
                 }
             }
@@ -159,7 +159,7 @@ object Usuario {
                 TipoUsuario.ORGANIZADOR -> 0..7
                 else -> 0..4
             }
-            val opcaoAlterarUsuario = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", limiteOpcoes)
+            val opcaoAlterarUsuario = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", limiteOpcoes)
 
             when (opcaoAlterarUsuario) {
                 0 -> {
@@ -168,22 +168,22 @@ object Usuario {
                 }
 
                 1 -> {
-                    usuarioEncontrado.nome = readString("Digite Nome atualizado: ", "ERRO: Nome inválido. Tente novamente.", 2).uppercase()
+                    usuarioEncontrado.nome = readString("Digite Nome atualizado: ", "ERRO: Nome inválido. Tente novamente.\n", 2).uppercase()
                     println("OK: NOME DEFINIDO '${usuarioEncontrado.nome}'.\n")
                 }
 
                 2 -> {
                     println("MENU: ALTERAR DATA DE NASCIMENTO")
-                    val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.", 1..31)
-                    val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.", 1..12)
-                    val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.", 1920..2020)
+                    val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                    val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                    val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2020)
                     usuarioEncontrado.dataNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
-                    println("OK: DATA DE NASCIMENTO DEFINIDA '${usuarioEncontrado.dataNascimento}'.")
+                    println("OK: DATA DE NASCIMENTO DEFINIDA '${usuarioEncontrado.dataNascimento}'.\n")
                 }
 
                 3 -> {
                     println("ALTERANDO: Sexo \n[1] MASCULINO, [2] FEMININO, [3] NÃO INFORMADO")
-                    val alterarSexo = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..3)
+                    val alterarSexo = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..3)
                     usuarioEncontrado.sexo =
                         when (alterarSexo) {
                             1 -> SexoUsuario.MASCULINO
@@ -196,8 +196,8 @@ object Usuario {
                 4 -> {
                     var cadastroSenha: String
                     do {
-                        cadastroSenha = readString("Digite Senha atualizada: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente. ", 8)
-                        val confirmarSenha = readString("Confirme Senha atualizada: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente. ", 8)
+                        cadastroSenha = readString("Digite Senha atualizada: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
+                        val confirmarSenha = readString("Confirme Senha atualizada: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
 
                         when {
                             cadastroSenha != confirmarSenha -> println("ERRO: Senhas não conferem. Tente novamente.\n")
@@ -210,33 +210,33 @@ object Usuario {
                 5 -> {
                     when {
                         usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                            usuarioEncontrado.cnpj = readString("Digite CNPJ (14 dígitos) atualizado: ", "ERRO: CNPJ inválido. Tente novamente.", 14)
+                            usuarioEncontrado.cnpj = readString("Digite CNPJ (14 dígitos) atualizado: ", "ERRO: CNPJ inválido. Tente novamente.\n", 14)
                             println("OK: CNPJ DEFINIDO '${usuarioEncontrado.cnpj}'.\n")
                         }
 
-                        else -> println("ERRO: Opção inválida. Tente novamente.")
+                        else -> println("ERRO: Opção inválida. Tente novamente.\n")
                     }
                 }
 
                 6 -> {
                     when {
                         usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                            usuarioEncontrado.razaoSocial = readString("Digite Razão Social atualizada: ", "ERRO: Razão Social inválida. Tente novamente.", 2).uppercase()
+                            usuarioEncontrado.razaoSocial = readString("Digite Razão Social atualizada: ", "ERRO: Razão Social inválida. Tente novamente.\n", 2).uppercase()
                             println("OK: RAZÃO SOCIAL DEFINIDA '${usuarioEncontrado.razaoSocial}'.\n")
                         }
 
-                        else -> println("ERRO: Opção inválida. Tente novamente.")
+                        else -> println("ERRO: Opção inválida. Tente novamente.\n")
                     }
                 }
 
                 7 -> {
                     when {
                         usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                            usuarioEncontrado.nomeFantasia = readString("Digite Nome Fantasia atualizado: ", "ERRO: Nome Fantasia inválido. Tente novamente.", 2).uppercase()
+                            usuarioEncontrado.nomeFantasia = readString("Digite Nome Fantasia atualizado: ", "ERRO: Nome Fantasia inválido. Tente novamente.\n", 2).uppercase()
                             println("OK: NOME FANTASIA DEFINIDO '${usuarioEncontrado.nomeFantasia}'.\n")
                         }
 
-                        else -> println("ERRO: Opção inválida. Tente novamente.")
+                        else -> println("ERRO: Opção inválida. Tente novamente.\n")
                     }
                 }
             }
@@ -297,13 +297,12 @@ object Usuario {
             }
         }
 
-        print("[QUALQUER TECLA] Voltar\n")
-        readln()
+        readString("[QUALQUER TECLA] Voltar\n", "ERRO: Um caractere é necessário. Tente novamente.\n")
     }
 
     fun desativarUsuario(usuarioEncontrado: DadosUsuario) {
         println("Desativar a conta? [1] SIM [2] NÃO: ")
-        val desativarConta = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 1..2)
+        val desativarConta = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 1..2)
 
         when (desativarConta) {
             1 -> {
@@ -316,7 +315,7 @@ object Usuario {
                 }
 
                 when (possuiEventos) {
-                    true -> println("ERRO: Você tem eventos ativos. Desativação não permitida.")
+                    true -> println("ERRO: Você tem eventos ativos. Desativação não permitida.\n")
                     false -> {
                         usuarioEncontrado.statusConta = false
                         println("OK:\nConta desativada (${usuarioEncontrado.email}).")
@@ -325,7 +324,7 @@ object Usuario {
                 }
             }
 
-            else -> println("ERRO: Opção inválida. Solicite novamente.")
+            else -> println("ERRO: Opção inválida. Solicite novamente.\n")
         }
     }
 }

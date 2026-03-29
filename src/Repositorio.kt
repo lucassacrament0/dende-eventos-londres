@@ -1,4 +1,5 @@
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object Repositorio {
     val listaUsuarios = mutableListOf<DadosUsuario>()
@@ -6,6 +7,9 @@ object Repositorio {
     val listaIngressos = mutableListOf<DadosIngresso>()
 
     val dataHoje: LocalDateTime = LocalDateTime.now()
+    val dataFormatada: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+
+    fun formatarData(data: LocalDateTime): String = data.format(dataFormatada)
 
     fun verificarEmailRepetido(cadastroEmail: String): Boolean {
         return listaUsuarios.any { it.email == cadastroEmail }

@@ -1,14 +1,13 @@
 fun main() {
-    println("BEM-VINDO AO DENDÊ EVENTOS")
-    println(Repositorio.dataHoje)
+    println("BEM-VINDO AO DENDÊ EVENTOS\n")
 
     // Loop do menu inicial
     do {
-        println("MENU INICIAL")
+        println("MENU INICIAL (${Repositorio.formatarData(Repositorio.dataHoje)})")
         println("1. Cadastrar Usuário")
         println("2. Acessar Usuário")
         println("0. Sair")
-        val opcaoMenuInicial = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", 0..2)
+        val opcaoMenuInicial = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 0..2)
 
         // Opções do menu
         when (opcaoMenuInicial) {
@@ -22,7 +21,7 @@ fun main() {
                     usuarioEncontrado != null && usuarioEncontrado.statusConta -> {
                         println("OK: Acesso bem-sucedido.\n")
                         do {
-                            println("MENU PRINCIPAL - ÁREA LOGADA")
+                            println("MENU PRINCIPAL - ÁREA LOGADA (${Repositorio.formatarData(Repositorio.dataHoje)})")
                             println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
                             println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
 
@@ -37,13 +36,7 @@ fun main() {
                                 }
                             }
                             println("[0] Encerrar Sessão")
-
-                            // Variável para limitar as opções do menu em intervalos com base no tipo de usuário
-                            val limiteOpcoes = when (usuarioEncontrado.tipoUsuario) {
-                                TipoUsuario.COMUM -> (0..5)
-                                else -> 0..9
-                            }
-                            var opcaoMenuLogado = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.", limiteOpcoes)
+                            var opcaoMenuLogado = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 0..9)
 
                             // Opções do menu logado
                             when (opcaoMenuLogado) {
