@@ -318,7 +318,7 @@ object Usuario {
                 }
             }
 
-            else -> println("ERRO: Opção inválida. Solicite novamente.\n")
+            else -> println("OK: Operação cancelada.\n")
         }
     }
 }

@@ -175,7 +175,7 @@ object Ingresso {
 
                 val ingressosUsuario = Repositorio.listarIngressosUsuario(usuarioEncontrado.email)
                 when (ingressosUsuario.isEmpty()) {
-                    true -> println("AVISO: Você não possui ingressos cadastrados.")
+                    true -> println("AVISO: Você não possui ingressos cadastrados.\n")
                     false -> {
                         val ingressosOrdenados = Repositorio.ingressosUsuarioOrdenados(usuarioEncontrado.email)
                         val colunas = listOf("ID", "EVENTO", "VALOR", "STATUS")

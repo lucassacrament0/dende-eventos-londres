@@ -20,78 +20,100 @@ fun main() {
                 when {
                     usuarioEncontrado != null && usuarioEncontrado.statusConta -> {
                         println("OK: Acesso bem-sucedido.\n")
-                        do {
-                            println("MENU PRINCIPAL - ÁREA LOGADA (${Repositorio.formatarDataHora(Repositorio.dataHoje)})")
-                            println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
-                            println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
-
-                            // Condicional para tornar menu dinâmico com base no tipo de usuário
-                            when {
-                                usuarioEncontrado.tipoUsuario == TipoUsuario.COMUM -> {
+                        when {
+                            usuarioEncontrado.tipoUsuario == TipoUsuario.COMUM -> {
+                                do {
+                                    println("MENU PRINCIPAL - ÁREA LOGADA (${Repositorio.formatarDataHora(Repositorio.dataHoje)})")
+                                    println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
+                                    println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
                                     println("[4] Feed de Eventos [5] Visualizar Ingressos")
-                                }
+                                    println("[0] Encerrar Sessão")
+                                    var opcaoMenuLogado = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 0..5)
 
-                                usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
-                                    println("[6] Cadastrar Evento [7] Alterar Evento [8] Visualizar Eventos [9] Desativar Evento")
-                                }
+                                    // Opções do menu logado
+                                    when (opcaoMenuLogado) {
+                                        1 -> {
+                                            Usuario.alterarUsuario(usuarioEncontrado)
+                                        }
+
+                                        2 -> {
+                                            Usuario.visualizarUsuario(usuarioEncontrado)
+                                        }
+
+                                        3 -> {
+                                            Usuario.desativarUsuario(usuarioEncontrado)
+                                            opcaoMenuLogado = 0
+                                        }
+
+                                        4 -> {
+                                            Evento.feedEventos(usuarioEncontrado)
+                                        }
+
+                                        5 -> {
+                                            Ingresso.visualizarIngressos(usuarioEncontrado)
+                                        }
+
+                                        // Opção para fechar o menu principal
+                                        0 -> {
+                                            println("OK: Sessão encerrada.\n")
+                                            opcaoMenuLogado = 0
+                                        }
+                                    }
+                                } while (opcaoMenuLogado != 0)
                             }
-                            println("[0] Encerrar Sessão")
-                            var opcaoMenuLogado = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 0..9)
 
-                            // Opções do menu logado
-                            when (opcaoMenuLogado) {
-                                1 -> {
-                                    Usuario.alterarUsuario(usuarioEncontrado)
-                                }
+                            usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {
+                                do {
+                                    println("MENU PRINCIPAL - ÁREA LOGADA (${Repositorio.formatarDataHora(Repositorio.dataHoje)})")
+                                    println("USUÁRIO: ${usuarioEncontrado.nome} (${usuarioEncontrado.email}).")
+                                    println("[1] Alterar Usuário [2] Visualizar Usuário [3] Desativar Usuário")
+                                    println("[4] Cadastrar Evento [5] Alterar Evento [6] Visualizar Eventos [7] Desativar Evento")
+                                    println("[0] Encerrar Sessão")
+                                    var opcaoMenuLogado = readInt("Digite opção: ", "ERRO: Opção inválida. Tente novamente.\n", 0..7)
+                                    when (opcaoMenuLogado) {
+                                        1 -> {
+                                            Usuario.alterarUsuario(usuarioEncontrado)
+                                        }
 
-                                2 -> {
-                                    Usuario.visualizarUsuario(usuarioEncontrado)
-                                }
+                                        2 -> {
+                                            Usuario.visualizarUsuario(usuarioEncontrado)
+                                        }
 
-                                3 -> {
-                                    Usuario.desativarUsuario(usuarioEncontrado)
-                                    opcaoMenuLogado = 0
-                                }
+                                        3 -> {
+                                            Usuario.desativarUsuario(usuarioEncontrado)
+                                            opcaoMenuLogado = 0
+                                        }
 
-                                4 -> {
-                                    Evento.feedEventos(usuarioEncontrado)
-                                }
+                                        4 -> {
+                                            Evento.cadastrarEvento(usuarioEncontrado)
+                                        }
 
-                                5 -> {
-                                    Ingresso.visualizarIngressos(usuarioEncontrado)
-                                }
+                                        5 -> {
+                                            Evento.alterarEvento(usuarioEncontrado)
+                                        }
 
-                                6 -> {
-                                    Evento.cadastrarEvento(usuarioEncontrado)
-                                }
+                                        6 -> {
+                                            Evento.visualizarEventos(usuarioEncontrado)
+                                        }
 
-                                7 -> {
-                                    Evento.alterarEvento(usuarioEncontrado)
-                                }
+                                        7 -> {
+                                            Evento.desativarEvento(usuarioEncontrado)
+                                        }
 
-                                8 -> {
-                                    Evento.visualizarEventos(usuarioEncontrado)
-                                }
-
-                                9 -> {
-                                    Evento.desativarEvento(usuarioEncontrado)
-                                }
-
-                                // Opção para fechar o menu principal
-                                0 -> {
-                                    println("OK: Sessão encerrada.\n")
-                                    opcaoMenuLogado = 0
-                                }
+                                        0 -> {
+                                            println("OK: Sessão encerrada.\n")
+                                            opcaoMenuLogado = 0
+                                        }
+                                    }
+                                } while (opcaoMenuLogado != 0)
                             }
-                        } while (opcaoMenuLogado != 0)
+                        }
                     }
                 }
             }
 
             // Opção para fechar o menu inicial
-            0 -> {
-                print("OK: Operação finalizada.")
-            }
+            0 -> print("OK: Operação finalizada.")
         }
     } while (opcaoMenuInicial != 0)
 }
