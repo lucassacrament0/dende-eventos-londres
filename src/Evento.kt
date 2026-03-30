@@ -8,7 +8,7 @@ object Evento {
 
                 val eventosOrdenados = Repositorio.eventosDisponiveisOrdenados(Repositorio.dataHoje)
                 when (eventosOrdenados.isEmpty()) {
-                    true -> println("AVISO: Nenhum evento disponível no momento.")
+                    true -> println("AVISO: Nenhum evento disponível no momento.\n")
                     false -> {
                         val existemEventos = true
                         val colunas = listOf("ID", "NOME", "DATA", "LOCAL", "PREÇO", "VAGAS")
@@ -19,7 +19,7 @@ object Evento {
                             listOf(
                                 evento.id.toString(),
                                 evento.nome,
-                                Repositorio.formatarData(evento.dataInicio),
+                                Repositorio.formatarDataHora(evento.dataInicio),
                                 evento.local,
                                 "R$${evento.precoIngresso}",
                                 vagasRestantes.toString()
@@ -52,43 +52,47 @@ object Evento {
                 val cadastroDescricao = readString("Digite Descrição do Evento: ", "ERRO: Descrição inválida. Tente novamente.\n")
 
                 var dataValida = false
-                var dataInicio: LocalDateTime
-                var dataFinal: LocalDateTime
+                var dataInicio = LocalDateTime.now()
+                var dataFinal = LocalDateTime.now()
                 do {
-                    println("\nDEFINIR PERÍODO DO EVENTO")
+                    try {
+                        println("\nDEFINIR PERÍODO DO EVENTO")
 
-                    println("MENU: DATA DE INÍCIO")
-                    val diaInicio = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                    val mesInicio = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                    val anoInicio = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
-                    val horaInicio = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
-                    val minutoInicio = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
+                        println("MENU: DATA DE INÍCIO")
+                        val diaInicio = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                        val mesInicio = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                        val anoInicio = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
+                        val horaInicio = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
+                        val minutoInicio = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
 
-                    println("MENU: DATA DE TÉRMINO")
-                    val diaFinal = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                    val mesFinal = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                    val anoFinal = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
-                    val horaFinal = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
-                    val minutoFinal = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
+                        println("MENU: DATA DE TÉRMINO")
+                        val diaFinal = readInt("Digite Somente Dia (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                        val mesFinal = readInt("Digite Somente Mês (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                        val anoFinal = readInt("Digite Somente Ano (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
+                        val horaFinal = readInt("Digite Somente Hora (HH): ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
+                        val minutoFinal = readInt("Digite Somente Minuto (MM): ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
 
-                    dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
-                    dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
-                    val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
-                    when {
-                        dataInicio.isBefore(Repositorio.dataHoje) ->
-                            println("ERRO: O evento não pode ser no passado.")
+                        dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
+                        dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
+                        val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
+                        when {
+                            dataInicio.isBefore(Repositorio.dataHoje) ->
+                                println("ERRO: O evento não pode ser no passado. Tente novamente.")
 
-                        dataFinal.isBefore(dataInicio) ->
-                            println("ERRO: Data/hora de término antes da data/hora de início.")
+                            dataFinal.isBefore(dataInicio) ->
+                                println("ERRO: Data/hora de término antes da data/hora de início. Tente novamente.")
 
-                        duracaoMinutos < 30 ->
-                            println("ERRO: A duração mínima é de 30 minutos.")
+                            duracaoMinutos < 30 ->
+                                println("ERRO: A duração mínima é de 30 minutos. Tente novamente.")
 
-                        else -> {
-                            println("OK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio às $horaInicio:" + minutoInicio.toString().padStart(2, '0'))
-                            println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal às $horaFinal:" + minutoFinal.toString().padStart(2, '0'))
-                            dataValida = true
+                            else -> {
+                                println("OK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio às $horaInicio:" + minutoInicio.toString().padStart(2, '0'))
+                                println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal às $horaFinal:" + minutoFinal.toString().padStart(2, '0'))
+                                dataValida = true
+                            }
                         }
+                    } catch (_: java.time.DateTimeException) {
+                        println("ERRO: Data inválida. Tente novamente.")
                     }
                 } while (!dataValida)
 
@@ -301,44 +305,47 @@ object Evento {
 
                                                         4 -> {
                                                             var dataValida = false
-
                                                             do {
-                                                                println("\nALTERAR PERÍODO DO EVENTO")
+                                                                try {
+                                                                    println("\nALTERAR PERÍODO DO EVENTO")
 
-                                                                println("MENU: ALTERAR DATA DE INÍCIO")
-                                                                val diaInicio = readInt("Digite Somente Dia (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                                                                val mesInicio = readInt("Digite Somente Mês (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                                                                val anoInicio = readInt("Digite Somente Ano (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
-                                                                val horaInicio = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
-                                                                val minutoInicio = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
+                                                                    println("MENU: ALTERAR DATA DE INÍCIO")
+                                                                    val diaInicio = readInt("Digite Somente Dia (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                                                                    val mesInicio = readInt("Digite Somente Mês (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                                                                    val anoInicio = readInt("Digite Somente Ano (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
+                                                                    val horaInicio = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
+                                                                    val minutoInicio = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
 
-                                                                println("MENU: ALTERAR DATA DE TÉRMINO")
-                                                                val diaFinal = readInt("Digite Somente Dia (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                                                                val mesFinal = readInt("Digite Somente Mês (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                                                                val anoFinal = readInt("Digite Somente Ano (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
-                                                                val horaFinal = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
-                                                                val minutoFinal = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
+                                                                    println("MENU: ALTERAR DATA DE TÉRMINO")
+                                                                    val diaFinal = readInt("Digite Somente Dia (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                                                                    val mesFinal = readInt("Digite Somente Mês (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                                                                    val anoFinal = readInt("Digite Somente Ano (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 2026..2100)
+                                                                    val horaFinal = readInt("Digite Somente Hora (HH) atualizada: ", "ERRO: Hora inválida. Tente novamente.\n", 0..23)
+                                                                    val minutoFinal = readInt("Digite Somente Minuto (MM) atualizado: ", "ERRO: Minuto inválido. Tente novamente.\n", 0..59)
 
-                                                                val dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
-                                                                val dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
-                                                                val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
-                                                                when {
-                                                                    dataInicio.isBefore(Repositorio.dataHoje) ->
-                                                                        println("ERRO: O evento não pode ser no passado.")
+                                                                    val dataInicio = LocalDateTime.of(anoInicio, mesInicio, diaInicio, horaInicio, minutoInicio)
+                                                                    val dataFinal = LocalDateTime.of(anoFinal, mesFinal, diaFinal, horaFinal, minutoFinal)
+                                                                    val duracaoMinutos = java.time.Duration.between(dataInicio, dataFinal).toMinutes()
+                                                                    when {
+                                                                        dataInicio.isBefore(Repositorio.dataHoje) ->
+                                                                            println("ERRO: O evento não pode ser no passado. Tente novamente.")
 
-                                                                    dataFinal.isBefore(dataInicio) ->
-                                                                        println("ERRO: Data de término antes da data de início.")
+                                                                        dataFinal.isBefore(dataInicio) ->
+                                                                            println("ERRO: Data de término antes da data de início. Tente novamente.")
 
-                                                                    duracaoMinutos < 30 ->
-                                                                        println("ERRO: A duração mínima é de 30 minutos.")
+                                                                        duracaoMinutos < 30 ->
+                                                                            println("ERRO: A duração mínima é de 30 minutos. Tente novamente.")
 
-                                                                    else -> {
-                                                                        eventoAlterando.dataInicio = dataInicio
-                                                                        eventoAlterando.dataTermino = dataFinal
-                                                                        println("\nOK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio.")
-                                                                        println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal.")
-                                                                        dataValida = true
+                                                                        else -> {
+                                                                            eventoAlterando.dataInicio = dataInicio
+                                                                            eventoAlterando.dataTermino = dataFinal
+                                                                            println("\nOK:\nDATA DE INÍCIO DEFINIDA $diaInicio/$mesInicio/$anoInicio.")
+                                                                            println("DATA DE TÉRMINO DEFINIDA $diaFinal/$mesFinal/$anoFinal.")
+                                                                            dataValida = true
+                                                                        }
                                                                     }
+                                                                } catch (_: java.time.DateTimeException) {
+                                                                    println("ERRO: Data inválida. Tente novamente.")
                                                                 }
                                                             } while (!dataValida)
                                                         }
@@ -518,7 +525,7 @@ object Evento {
                                 evento.id.toString(),
                                 statusTexto,
                                 evento.nome,
-                                Repositorio.formatarData(evento.dataInicio),
+                                Repositorio.formatarDataHora(evento.dataInicio),
                                 evento.local,
                                 "R$${evento.precoIngresso}",
                                 "$ingressosVendidos / ${evento.capacidadeMax}"
@@ -540,8 +547,8 @@ object Evento {
                                         println("Nome: ${eventoDetalhes.nome}")
                                         println("Descrição: ${eventoDetalhes.descricao}")
                                         println("Página: ${eventoDetalhes.pagina}")
-                                        println("Início: ${Repositorio.formatarData(eventoDetalhes.dataInicio)}")
-                                        println("Término: ${Repositorio.formatarData(eventoDetalhes.dataTermino)}")
+                                        println("Início: ${Repositorio.formatarDataHora(eventoDetalhes.dataInicio)}")
+                                        println("Término: ${Repositorio.formatarDataHora(eventoDetalhes.dataTermino)}")
                                         println("Tipo: ${eventoDetalhes.tipo}")
                                         println("Modalidade: ${eventoDetalhes.modalidade}")
                                         println("Local: ${eventoDetalhes.local}")

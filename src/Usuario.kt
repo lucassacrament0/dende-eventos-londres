@@ -1,4 +1,4 @@
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 object Usuario {
     fun validarEmailCadastro(emailInserido: String, emailConfirmado: String): Boolean {
@@ -34,12 +34,21 @@ object Usuario {
                 val cadastroNome = readString("Digite Nome: ", "ERRO: Nome inválido. Tente novamente.\n", 2).uppercase()
                 println("OK: NOME DEFINIDO '$cadastroNome'.\n")
 
-                println("MENU: DEFINIR DATA DE NASCIMENTO")
-                val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2020)
-                val cadastroNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
-                println("OK: DATA DE NASCIMENTO DEFINIDA $cadastroNascimento.\n")
+                var cadastroNascimento: LocalDate = LocalDate.now()
+                var dataValida = false
+                do {
+                    try {
+                        println("MENU: DEFINIR DATA DE NASCIMENTO")
+                        val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD): ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                        val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM): ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                        val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA): ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2010)
+                        cadastroNascimento = LocalDate.of(anoNascimento, mesNascimento, diaNascimento)
+                        dataValida = true
+                    } catch (_: java.time.DateTimeException) {
+                        println("ERRO: Data inválida. Tente novamente.\n")
+                    }
+                } while (!dataValida)
+                println("OK: DATA DE NASCIMENTO DEFINIDA ${Repositorio.formatarData(cadastroNascimento)}.\n")
 
                 val cadastroSenha = readString("Digite Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
                 val confirmarSenha = readString("Confirme Nova Senha: ", "ERRO: A senha deve ter no mínimo 8 caracteres. Tente novamente.\n", 8)
@@ -110,6 +119,7 @@ object Usuario {
                         Repositorio.adicionarDadosUsuario(cadastroUsuario)
                         println("OK: USUÁRIO CADASTRADO COM SUCESSO.\n")
                     }
+
                     !validarSenhaCadastro(cadastroSenha, confirmarSenha) -> println("ERRO: Senhas não conferem. Tente novamente.\n")
                 }
             }
@@ -173,12 +183,20 @@ object Usuario {
                 }
 
                 2 -> {
-                    println("MENU: ALTERAR DATA DE NASCIMENTO")
-                    val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
-                    val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
-                    val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2020)
-                    usuarioEncontrado.dataNascimento = "$diaNascimento/$mesNascimento/$anoNascimento"
-                    println("OK: DATA DE NASCIMENTO DEFINIDA '${usuarioEncontrado.dataNascimento}'.\n")
+                    var dataValida = false
+                    do {
+                        try {
+                            println("MENU: DEFINIR DATA DE NASCIMENTO")
+                            val diaNascimento = readInt("Digite Somente Dia de Nascimento (DD) atualizado: ", "ERRO: Dia inválido. Tente novamente.\n", 1..31)
+                            val mesNascimento = readInt("Digite Somente Mês de Nascimento (MM) atualizado: ", "ERRO: Mês inválido. Tente novamente.\n", 1..12)
+                            val anoNascimento = readInt("Digite Somente Ano de Nascimento (AAAA) atualizado: ", "ERRO: Ano inválido. Tente novamente.\n", 1920..2010)
+                            usuarioEncontrado.dataNascimento = LocalDate.of(anoNascimento, mesNascimento, diaNascimento)
+                            println("OK: DATA DE NASCIMENTO DEFINIDA '${usuarioEncontrado.dataNascimento}'.\n")
+                            dataValida = true
+                        } catch (_: java.time.DateTimeException) {
+                            println("ERRO: Data inválida. Tente novamente.\n")
+                        }
+                    } while (!dataValida)
                 }
 
                 3 -> {
@@ -244,40 +262,16 @@ object Usuario {
     }
 
     fun visualizarUsuario(usuarioEncontrado: DadosUsuario) {
-        var diaInt = 0
-        var mesInt = 0
-        var anoInt = 0
-        val parteData = usuarioEncontrado.dataNascimento.split("/")
-        when (parteData.size) {
-            3 -> {
-                diaInt = parteData[0].toInt()
-                mesInt = parteData[1].toInt()
-                anoInt = parteData[2].toInt()
-            }
-        }
-
-        var idadeDia = LocalDateTime.now().dayOfMonth - diaInt
-        var idadeMes = LocalDateTime.now().monthValue - mesInt
-        var idadeAno = LocalDateTime.now().year - anoInt
-        when {
-            idadeDia < 0 -> {
-                idadeMes -= 1
-                idadeDia += 30
-            }
-        }
-
-        when {
-            idadeMes < 0 -> {
-                idadeAno -= 1
-                idadeMes += 12
-            }
-        }
+        val diferenca = java.time.Period.between(usuarioEncontrado.dataNascimento, LocalDate.now())
+        val idadeAnos = diferenca.years
+        val idadeMeses = diferenca.months
+        val idadeDias = diferenca.days
 
         println("\nSEU USUÁRIO:")
         println("Nome: ${usuarioEncontrado.nome}")
         println("E-mail: ${usuarioEncontrado.email}")
-        println("Data de Nascimento: ${usuarioEncontrado.dataNascimento}")
-        println("≈ $idadeAno anos, $idadeMes meses e $idadeDia dias")
+        println("Data de Nascimento: ${Repositorio.formatarData(usuarioEncontrado.dataNascimento)}")
+        println("Idade: $idadeAnos anos, $idadeMeses meses e $idadeDias dias")
         println("Sexo: ${usuarioEncontrado.sexo}")
         when {
             usuarioEncontrado.tipoUsuario == TipoUsuario.ORGANIZADOR -> {

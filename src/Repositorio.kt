@@ -1,3 +1,4 @@
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -7,9 +8,11 @@ object Repositorio {
     val listaIngressos = mutableListOf<DadosIngresso>()
 
     val dataHoje: LocalDateTime = LocalDateTime.now()
-    val dataFormatada: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    val dataHoraFormatada: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    val dataFormatada: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-    fun formatarData(data: LocalDateTime): String = data.format(dataFormatada)
+    fun formatarDataHora(data: LocalDateTime): String = data.format(dataHoraFormatada)
+    fun formatarData(data: LocalDate): String = data.format(dataFormatada)
 
     fun verificarEmailRepetido(cadastroEmail: String): Boolean {
         return listaUsuarios.any { it.email == cadastroEmail }

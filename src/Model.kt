@@ -1,3 +1,4 @@
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 enum class SexoUsuario { MASCULINO, FEMININO, NAO_INFORMADO }
@@ -6,7 +7,7 @@ enum class TipoUsuario { COMUM, ORGANIZADOR }
 data class DadosUsuario(
     var statusConta: Boolean,
     var nome: String,
-    var dataNascimento: String,
+    var dataNascimento: LocalDate,
     var sexo: SexoUsuario,
     val email: String,
     var senha: String,
